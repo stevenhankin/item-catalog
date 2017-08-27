@@ -1,4 +1,5 @@
 """Populates database with initial data."""
+import time
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -20,62 +21,84 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-# Create dummy user
+def add_car_items(category, user_id):
+    car_item1 = Item(user_id=user_id, category_id=category.id,
+                     name="Tesla Model S",
+                     description="Full-sized all-electric five-door, luxury "
+                                 "liftback, produced by Tesla, Inc., and"
+                                 " introduced on 22 June 2012.")
+    car_item2 = Item(user_id=user_id, category_id=category.id,
+                     name="Aston Martin Vanquish",
+                     description="British grand tourer that was introduced in "
+                                 "2001 as a successor to the ageing Virage"
+                                 " range.")
+    car_item3 = Item(user_id=user_id, category_id=category.id,
+                     name="Lamborghini Centenario",
+                     description="To commemorate Ferruccio Lamborghini's 100th "
+                                 "birthday, Lamborghini released a "
+                                 "limited-edition supercar based on the "
+                                 "Aventador at the March 2016 Geneva Motor "
+                                 "Show.")
+    session.add_all([car_item1, car_item2, car_item3])
+
+
+def add_food_items(category, user_id):
+    food_item1 = Item(user_id=user_id, category_id=category.id,
+                      name="Cottage Pie",
+                      description="Beef pie with a topping of mashed potato, "
+                                  "not pastry.")
+    food_item2 = Item(user_id=user_id, category_id=category.id,
+                      name="Chicken Tikka Masala",
+                      description="Dish of chunks of roasted marinated chicken"
+                                  " (chicken tikka) in a spiced curry sauce. "
+                                  "The sauce is usually creamy and "
+                                  "orange-coloured.")
+    session.add_all([food_item1, food_item2])
+
+
+def add_cat_items(category, user_id):
+    cat_item1 = Item(user_id=user_id, category_id=category.id,
+                     name="British Shorthair",
+                     description="The British Shorthair is the pedigreed "
+                                 "version of the traditional British domestic "
+                                 "cat, with a distinctively chunky body, dense"
+                                 " coat and broad face.")
+    cat_item2 = Item(user_id=user_id, category_id=category.id,
+                     name="Chartreux",
+                     description="The Chartreux is a rare breed of domestic cat"
+                                 " from France and is recognised by a number of"
+                                 " registries around the world.")
+    session.add_all([cat_item1, cat_item2])
+
+
+def add_categories(user_id):
+    """Categories for Cars, Food and Cats. A short delay is used between
+    adding items to categories to ensure that there is a "latest" ordering
+    :param user_id: ID of user that has created these categories and items
+    :return:
+    """
+    category1 = Category(user_id=user_id, name="Cars")
+    category2 = Category(user_id=user_id, name="Food")
+    category3 = Category(user_id=user_id, name="Cats")
+    session.add_all([category1, category2, category3])
+    session.commit()
+    # Add items to respective categories using sleep and
+    # commit to generate delay for time created values
+    add_car_items(category1, user_id)
+    time.sleep(1)
+    session.commit()
+    add_food_items(category2, user_id)
+    time.sleep(1)
+    session.commit()
+    add_cat_items(category3, user_id)
+    session.commit()
+
+
+# Create user and associated records
 User1 = User(name="Steven Hankin",
              email="steven.hankin@hmail.com",
-             picture="https://pbs.twimg.com/profile_images/2671170543"
-             + "/18debd694829ed78203a5a36dd364160_400x400.png")
+             picture="https://secure.gravatar.com/avatar/bbed4d2a6f627e45d8de9ed6e0c0a468?size=35")
 session.add(User1)
 session.commit()
+add_categories(User1.id)
 
-# Category for Cars
-category1 = Category(user_id=User1.id, name="Cars")
-session.add(category1)
-# Category for Food
-category2 = Category(user_id=User1.id, name="Food")
-session.add(category2)
-# Category for Cats
-category3 = Category(user_id=User1.id, name="Cats")
-session.add(category3)
-session.commit()
-
-# Items for Car category
-session.add(
-    Item(user_id=User1.id, category_id=category1.id,
-         name="Tesla Model S",
-         description="Full-sized all-electric five-door, luxury "
-         + "liftback, produced by Tesla, Inc., and introduced "
-         + "on 22 June 2012."))
-session.add(
-    Item(user_id=User1.id, category_id=category1.id,
-         name="Aston Martin Vanquish",
-         description="British grand tourer that was introduced in 2001 as"
-         + " a successor to the ageing Virage range."))
-session.add(
-    Item(user_id=User1.id, category_id=category1.id,
-         name="Lamborghini Centenario",
-         description="British grand tourer that was introduced in 2001 as"
-         + " a successor to the ageing Virage range."))
-session.commit()
-
-# Items for Food category
-session.add(
-    Item(user_id=User1.id, category_id=category2.id,
-         name="Cottage Pie",
-         description="Beef pie with a topping of mashed potato, not pastry."))
-session.add(
-    Item(user_id=User1.id, category_id=category2.id,
-         name="Chicken Tikka Masala",
-         description="dish of chunks of roasted marinated chicken (chicken tikka) in a spiced curry sauce. The sauce is usually creamy and orange-coloured."))
-session.commit()
-
-# Items for Cat category
-session.add(
-    Item(user_id=User1.id, category_id=category3.id,
-         name="British Shorthair",
-         description="The British Shorthair is the pedigreed version of the traditional British domestic cat, with a distinctively chunky body, dense coat and broad face."));
-session.add(
-    Item(user_id=User1.id, category_id=category3.id,
-         name="Chartreux",
-         description="The Chartreux is a rare breed of domestic cat from France and is recognised by a number of registries around the world."))
-session.commit()

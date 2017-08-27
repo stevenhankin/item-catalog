@@ -1,1 +1,17 @@
-<h1>Hello :)</h1>
+{% extends "main.html" %}
+{% block body %}
+<h1>Categories</h1>
+<ul class="categories">
+    {% for category in categories %}
+    <li>{{category.name}}</li>
+    {% endfor %}
+</ul>
+<h1>Latest Items</h1>
+<ul class="latest-items">
+    {% for item in latest_items %}
+    <li>{{item.name}}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
+
