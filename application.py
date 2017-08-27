@@ -24,3 +24,8 @@ def showCategories():
         return render_template('public_categories.html', categories=categories)
     else:
         return render_template('categories.html', categories=categories)
+
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)
