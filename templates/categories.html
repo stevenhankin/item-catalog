@@ -9,9 +9,8 @@
 <h1>Latest Items</h1>
 <ul class="latest-items">
     {% for item in latest_items %}
-    <li>{{item.name}}</li>
+    <div class="latest-item"><div class="item-name">{{item.item_name}}</div><div class="category-name">({{item.category_name}})</div></div>
     {% endfor %}
 </ul>
-
 {% endblock %}
 
