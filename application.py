@@ -40,10 +40,12 @@ def show_category_items(category_id):
     all_categories = session.query(Category).order_by(asc(Category.name)).all()
     category = session.query(Category).filter(Category.id == category_id).first()
     items = session.query(Item).filter(Item.category_id == category_id)
+    item_count = items.count()
     return render_template('category_items.html',
                            all_categories=all_categories,
                            category=category,
-                           items=items)
+                           items=items,
+                           item_count=item_count)
 
 
 if __name__ == '__main__':

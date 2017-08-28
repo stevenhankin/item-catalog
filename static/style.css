@@ -1,7 +1,17 @@
 body {
-    background-color: #fdfdfd;
+    background-color: #fbfbfb;
+}
+
+.container {
+    border: 2px solid #dddddd;
+    padding-bottom: 10px;
 }
 
 .titlebar {
     background-color: lightblue;
+    margin-bottom: 5px;
+}
+
+.category-list {
+    border-right: 2px solid #dddddd;
 }

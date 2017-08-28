@@ -3,20 +3,22 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
     <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div class="container">
     <div class="row titlebar">
-        <div class="col-md-10"><h1>Catalog App</h1></div>
-        <div class="col-md-2"><button class="btn btn-primary h1">Login</button></div>
+        <div class="col-xs-10 col-md-11"><h1>Catalog App</h1></div>
+        <div class="col-xs-2 col-md-1">
+            <button class="btn btn-primary h1">Login</button>
+        </div>
     </div>
     <div class="row">
         {% block body %}
         {% endblock %}
     </div>
 </div>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>

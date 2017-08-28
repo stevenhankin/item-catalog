@@ -1,16 +1,26 @@
 {% extends "main.html" %}
 {% block body %}
-<div class="col-md-2">
-    <h2>Categories</h2>
-    <ul class="categories">
-        {% for category in all_categories %}
-        <li><a href="{{ url_for('show_category_items',category_id=category.id) }}">{{category.name}}</a></li>
-        {% endfor %}
-    </ul>
+<div class="col-md-2 category-list">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Categories</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group-vertical btn-group-lg" role="group">
+                {% for category in all_categories %}
+                <a class="btn btn-default"
+                   href="{{ url_for('show_category_items',category_id=category.id) }}">{{category.name}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="col-md-10">
-    <h2>{{category.name}} Items (x items)</h2>
+<div class="col-md-4">
+    <h3>{{category.name}} Items ({{ item_count }} items)</h3>
     <ul class="items">
         {% for item in items %}
         <div class="latest-item">
@@ -21,4 +31,3 @@
     </ul>
 </div>
 {% endblock %}
-
