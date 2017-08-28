@@ -1,19 +1,24 @@
 {% extends "main.html" %}
 {% block body %}
-<h1>Categories</h1>
-<ul class="categories">
-    {% for category in categories %}
-    <li><a href="{{ url_for('show_category_items',category_id=category.id) }}">{{category.name}}</a></li>
-    {% endfor %}
-</ul>
-<h1>Latest Items</h1>
-<ul class="latest-items">
-    {% for item in latest_items %}
-    <div class="latest-item">
-        <div class="item-name">{{item.item_name}}</div>
-        <div class="category-name">({{item.category_name}})</div>
-    </div>
-    {% endfor %}
-</ul>
+<div class="col-md-2">
+    <h2>Categories</h2>
+    <ul class="categories">
+        {% for category in categories %}
+        <li><a href="{{ url_for('show_category_items',category_id=category.id) }}">{{category.name}}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="col-md-10">
+    <h2>Latest Items</h2>
+    <ul class="latest-items">
+        {% for item in latest_items %}
+        <div class="latest-item">
+            <div class="item-name">{{item.item_name}}</div>
+            <div class="category-name">({{item.category_name}})</div>
+        </div>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
 
