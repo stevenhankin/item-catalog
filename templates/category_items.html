@@ -3,15 +3,15 @@
 <h1>Categories</h1>
 <ul class="categories">
     {% for category in categories %}
-    <li><a href="{{ url_for('show_category_items',category_id=category.id) }}">{{category.name}}</a></li>
+    <li>{{category.name}}</li>
     {% endfor %}
 </ul>
-<h1>Latest Items</h1>
-<ul class="latest-items">
-    {% for item in latest_items %}
+<h1>{{category.name}} Items (x items)</h1>
+<ul class="items">
+    {% for item in items %}
     <div class="latest-item">
         <div class="item-name">{{item.item_name}}</div>
-        <div class="category-name">({{item.category_name}})</div>
+        <div class="category-name">{{item.name}}</div>
     </div>
     {% endfor %}
 </ul>

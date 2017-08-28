@@ -14,21 +14,29 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-# Show all Categories
+# Show all Categories and latest Items
 @app.route('/')
-@app.route('/category/')
-def show_category_items():
+def show_homepage():
     categories = session.query(Category).order_by(asc(Category.name)).all()
     # if 'username' not in login_session:
     #     return render_template('public_categories.html', categories=categories)
     # else:
-    s = "select item.name as item_name, category.name as category_name" \
+    s = "select item.name as item_name, category.name as category_name, category.id as category_id " \
         " from item" \
         " join category on (item.category_id = category.id)" \
         " order by item.time_created DESC" \
         " limit 5"
     latest_items = session.execute(s).fetchall()
     return render_template('categories.html', categories=categories, latest_items=latest_items)
+
+
+# For specified category, display all items
+@app.route('/category/<int:category_id>/items')
+def show_category_items(category_id):
+    print "category_id "+ str(category_id)
+    category = session.query(Category).filter(Category.id == category_id).first()
+    items = session.query(Item).filter(Item.category_id == category_id)
+    return render_template('category_items.html', category=category, items=items)
 
 
 if __name__ == '__main__':
