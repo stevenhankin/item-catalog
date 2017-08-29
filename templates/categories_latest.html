@@ -1,0 +1,15 @@
+{% extends "categories_parent.html" %}
+{% block items %}
+<div class="row">
+    <div class="col-sm-12">
+        <h3>Latest {{max_items}} Items</h3>
+    </div>
+</div>
+<div class="row">
+    {% for item in latest_items %}
+    <div class="col-sm-12">
+        {{item.item_name}} ({{item.category_name}})
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

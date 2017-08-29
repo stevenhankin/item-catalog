@@ -6,13 +6,38 @@
     <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
     <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Start Amazon OAuth2 SDK -->
+    <div id="amazon-root"></div>
+    <script type="text/javascript">
+
+        window.onAmazonLoginReady = function () {
+            amazon.Login.setClientId('amzn1.application-oa2-client.bd44c678605c4ea5829e92a1695b7e93');
+        };
+        (function (d) {
+            var a = d.createElement('script');
+            a.type = 'text/javascript';
+            a.async = true;
+            a.id = 'amazon-login-sdk';
+            a.src = 'https://api-cdn.amazon.com/sdk/login1.js';
+            d.getElementById('amazon-root').appendChild(a);
+        })(document);
+
+    </script>
+    <!-- End Amazon OAuth2 SDK -->
+
 </head>
 <body>
 <div class="container">
     <div class="row titlebar">
-        <div class="col-xs-10 col-md-11"><h1>Catalog App</h1></div>
-        <div class="col-xs-2 col-md-1">
-            <button class="btn btn-primary h1">Login</button>
+        <div class="col-xs-9 col-sm-10 col-md-9"><h1>Catalog App</h1></div>
+        <div class="col-xs-3 col-sm-2 col-md-3 h1 login-button">
+            <a href="#" id="LoginWithAmazon">
+                <img border="0" alt="Login with Amazon"
+                     src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gry_195x46.png"
+                     width="195" height="46"/>
+            </a>
+            <!--<a id="Logout">Logout</a>-->
         </div>
     </div>
     <div class="row">
@@ -20,5 +45,16 @@
         {% endblock %}
     </div>
 </div>
+
+<!-- Start Amazon OAuth2 JS -->
+<script type="text/javascript">
+    document.getElementById('LoginWithAmazon').onclick = function () {
+        options = {scope: 'profile'};
+        amazon.Login.authorize(options, 'http://127.0.0.1:8000/login');
+        return false;
+    };
+</script>
+<!-- Start Amazon OAuth2 JS -->
+
 </body>
 </html>
