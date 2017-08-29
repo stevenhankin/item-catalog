@@ -8,4 +8,5 @@ Place your catalog project in this directory.
 # Running the application
 * git clone https://github.com/stevenhankin/fullstack-nanodegree-vm.git
 * cd fullstack-nanodegree-vm/vagrant && vagrant up && vagrant ssh
-* /vagrant/catalog/application.py
+* gunicorn application:app --chdir /vagrant/catalog
+

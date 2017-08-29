@@ -20,7 +20,7 @@ session = DBSession()
 # Show all Categories and latest Items
 @app.route('/')
 def show_homepage():
-    categories = session.query(Category).order_by(asc(Category.name)).all()
+    all_categories = session.query(Category).order_by(asc(Category.name)).all()
     # if 'username' not in login_session:
     #     return render_template('public_categories.html', categories=categories)
     # else:
@@ -32,7 +32,7 @@ def show_homepage():
         " limit 5"
     latest_items = session.execute(s).fetchall()
     return render_template('categories.html',
-                           categories=categories,
+                           all_categories=all_categories,
                            latest_items=latest_items)
 
 
@@ -51,17 +51,3 @@ def show_category_items(category_id):
                            item_count=item_count)
 
 
-# def app(environ, start_response):
-#     """Simplest possible application object"""
-#     data = 'Hello, World!\n'
-#     status = '200 OK'
-#     response_headers = [
-#         ('Content-type','text/plain'),
-#         ('Content-Length', str(len(data)))
-#     ]
-#     start_response(status, response_headers)
-#     return iter([data])
-
-# if __name__ == '__main__':
-#     app.debug = True
-#     app.run(host='0.0.0.0', port=5000)
