@@ -94,12 +94,21 @@ def add_categories(user_id):
     session.commit()
 
 
-# Create user and associated records
-User1 = User(name="Steven Hankin",
-             email="steven.hankin@hmail.com",
-             picture="https://secure.gravatar.com/avatar/bbed4d2a6f627e45d8de9ed6e0c0a468?size=35")
-session.add(User1)
-session.commit()
-print "Creating categories..."
-add_categories(User1.id)
+def populate_if_empty():
+    category_count = session.query(Category).count()
+    print "Table Category has " + str(category_count) + " records"
+    if category_count == 0:
+        print "Database appears empty. Adding some records..."
+        # Create user and associated records
+        User1 = User(name="Steven Hankin",
+                     email="steven.hankin@hmail.com",
+                     picture="https://secure.gravatar.com/avatar/bbed4d2a6f627e45d8de9ed6e0c0a468?size=35")
+        session.add(User1)
+        session.commit()
+        print "Creating categories..."
+        add_categories(User1.id)
+    else:
+        print "Database already contains data (no new records created)"
 
+
+populate_if_empty()
