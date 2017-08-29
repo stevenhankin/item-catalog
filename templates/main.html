@@ -37,7 +37,8 @@
                      src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gry_195x46.png"
                      width="195" height="46"/>
             </a>
-            <!--<a id="Logout">Logout</a>-->
+            <img src="{{picture}}"/>
+            <a id="Logout">Logout</a>
         </div>
     </div>
     <div class="row">
@@ -54,6 +55,11 @@
         return false;
     };
 </script>
+   <script type="text/javascript">
+      document.getElementById('Logout').onclick = function() {
+         amazon.Login.logout();
+      };
+   </script>
 <!-- Start Amazon OAuth2 JS -->
 
 </body>

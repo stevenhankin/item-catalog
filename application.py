@@ -1,6 +1,6 @@
 import database_setup
 import database_populate
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, g
 from sqlalchemy import create_engine, asc, desc, text
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Item
@@ -16,6 +16,9 @@ import StringIO
 
 app = Flask(__name__)
 
+app.secret_key = "\xc7\xc7\xf7\x80\x9b\xbb'\xd7\xa7\xe4\xa8\xd9\x7f\x03z)u&Z2c\xde\xf0\xd8"
+app.config['SESSION_TYPE'] = 'filesystem'
+
 engine = create_engine('sqlite:///itemcategories.db')
 Base.metadata.bind = engine
 
@@ -27,6 +30,14 @@ session = DBSession()
 # Show all Categories and latest Items
 @app.route('/')
 def show_homepage():
+
+    picture=""
+    if 'userid' in login_session:
+        print 'LOGGED IN as '+str(login_session['userid'])
+        # user = User(name=d['name'], email=d['email'], picture=gravatar)
+        user = session.query(User).filter(User.id == login_session['userid']).one()
+        picture = user.picture
+
     max_items = 5
     all_categories = session.query(Category).order_by(asc(Category.name)).all()
     # if 'username' not in login_session:
@@ -42,7 +53,8 @@ def show_homepage():
     return render_template('categories_latest.html',
                            all_categories=all_categories,
                            latest_items=latest_items,
-                           max_items=max_items)
+                           max_items=max_items,
+                           picture=picture)
 
 
 # For specified category, display all items
@@ -116,6 +128,7 @@ def login_redirect():
 
     print "%s %s %s" % (d['name'], d['email'], d['user_id'])
 
+    # Find user in database by email or create new record
     user = session.query(User).filter(User.email == d['email']).first()
     print user
     if user is None:
@@ -125,5 +138,7 @@ def login_redirect():
         user = User(name=d['name'], email=d['email'], picture=gravatar)
         session.add(user)
         session.commit()
+
+    login_session['userid']=user.id
 
     return redirect_dest('/')
