@@ -100,5 +100,6 @@ User1 = User(name="Steven Hankin",
              picture="https://secure.gravatar.com/avatar/bbed4d2a6f627e45d8de9ed6e0c0a468?size=35")
 session.add(User1)
 session.commit()
+print "Creating categories..."
 add_categories(User1.id)
 

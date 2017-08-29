@@ -1,8 +1,11 @@
+import database_setup
+import database_populate
 from flask import Flask, render_template, request, redirect, url_for
 from sqlalchemy import create_engine, asc, desc, text
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Item
 from flask import session as login_session
+
 
 app = Flask(__name__)
 
