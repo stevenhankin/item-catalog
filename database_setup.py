@@ -4,6 +4,8 @@ from sqlalchemy.dialects.mysql import DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+from database_populate import populate
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
@@ -43,9 +45,24 @@ class Item(Base):
     time_updated = Column(DATETIME(timezone=True, fsp=6), onupdate=func.now())
 
 
-engine = create_engine('sqlite:///itemcategories.db')
+# engine = create_engine('sqlite:///itemcategories.db')
+engine = create_engine('sqlite://')
 
+# Bind the engine to the metadata of the Base class so that the
+# declaratives can be accessed through a DBSession instance
+Base.metadata.bind = engine
+
+DBSession = sessionmaker(bind=engine)
+# A DBSession() instance establishes all conversations with the database
+# and represents a "staging zone" for all the objects loaded into the
+# database session object. Any change made against the objects in the
+# session won't be persisted into the database until you call
+# session.commit(). If you're not happy about the changes, you can
+# revert all of them back to the last commit by calling
+# session.rollback()
+session = DBSession()
 
 Base.metadata.create_all(engine)
 
+populate(session, User, Category, Item)
 
