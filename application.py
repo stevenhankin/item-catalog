@@ -19,25 +19,14 @@ app.secret_key = "\xc7\xc7\xf7\x80\x9b\xbb'\xd7\xa7\xe4\xa8\xd9\x7f\x03z)u&Z2c\x
 app.config['SESSION_TYPE'] = 'filesystem'
 
 
-# Show all Categories and latest Items
 @app.route('/')
 def show_homepage():
-    picture = ""
+    """
+    Shows all the available categories and items
+    :return:
+    """
     print "** LOGIN_SESSION is"
     print login_session
-    if 'userid' in login_session:
-        print 'LOGGED IN as ' + str(login_session['userid'])
-        # user = User(name=d['name'], email=d['email'], picture=gravatar)
-        try:
-            user = session.query(User).filter(User.id == login_session['userid']).one()
-            picture = user.picture
-            print user
-        except NoResultFound:
-            print "No such user in database - clearing state"
-            # del login_session['state']
-            # del login_session['userid']
-            login_session.clear()
-            pass
 
     max_items = 5
     all_categories = session.query(Category).order_by(asc(Category.name)).all()
@@ -55,13 +44,17 @@ def show_homepage():
                            all_categories=all_categories,
                            latest_items=latest_items,
                            max_items=max_items,
-                           picture=picture,
                            login_session=login_session)
 
 
 # For specified category, display all items
 @app.route('/category/<int:category_id>/items')
 def show_category_items(category_id):
+    """
+    Displays all the items for the selected category
+    :param category_id:
+    :return:
+    """
     print "category_id " + str(category_id)
     all_categories = session.query(Category).order_by(asc(Category.name)).all()
     category = session.query(Category).filter(Category.id == category_id).first()
@@ -75,13 +68,16 @@ def show_category_items(category_id):
                            login_session=login_session)
 
 
-# Displays item description
 @app.route('/category/<int:category_id>/items/<int:item_id>')
 def show_item_details(category_id, item_id):
-
+    """
+    Displays full description of an item
+    :param category_id:
+    :param item_id:
+    :return:
+    """
     print "** ITEM LOGIN_SESSION is"
     print login_session
-
     print "item_id " + str(item_id)
     # all_categories = session.query(Category).order_by(asc(Category.name)).all()
     # category = session.query(Category).filter(Category.id == category_id).first()
@@ -108,33 +104,33 @@ def logout():
     return redirect(nextRedirect)
 
 
-# Redirect (from Amazon)
 @app.route('/login')
 def login_redirect():
-
+    """
+    Redirect from Amazon Login with an auth token
+    :return:
+    """
     nextRedirect = request.args.get('next')
-
     access_token = request.args.get('access_token')
     print "access token is " + access_token
-
     d = amazon_authorization(access_token)
-
-    # State token to prevent CSRF
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
-    login_session['state'] = state
-
+    # # State token to prevent CSRF
+    # state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+    # login_session['state'] = state
     # Find user in database by email or create new record
     user = session.query(User).filter(User.email == d['email']).first()
     print user
     if user is None:
         m = hashlib.md5()
         m.update(d['email'])
-        gravatar = 'https://secure.gravatar.com/avatar/' + m.hexdigest() + '?size=35'
+        gravatar = 'https://secure.gravatar.com/avatar/' + m.hexdigest() + '?size=45'
         user = User(name=d['name'], email=d['email'], picture=gravatar)
         session.add(user)
         session.commit()
 
     login_session['userid'] = user.id
+    login_session['picture'] = user.picture
+    login_session['name'] = user.name
 
     return redirect_dest(nextRedirect)
 

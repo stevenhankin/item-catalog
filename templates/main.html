@@ -32,9 +32,9 @@
     <div class="row titlebar">
         <div class="col-xs-6 "><h1>Catalog App</h1></div>
         <div class="col-xs-6 h1 login-button">
-            {% if login_session['state'] %}
-            <img src="{{picture}}"/>
-            <a id="Logout" href="{{url_for('logout',next=request.path)}}">Logout</a>
+            {% if login_session['userid'] %}
+            <img class="picture" src="{{login_session['picture']}}"/>
+            <a id="Logout" class="h6" href="{{url_for('logout',next=request.path)}}">Not {{login_session['name']}}? Sign Out</a>
             {% else %}
             <a href="#" id="LoginWithAmazon">
                 <img border="0" alt="Login with Amazon"

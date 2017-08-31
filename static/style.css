@@ -19,3 +19,7 @@ body {
 .login-button {
     text-align: right;
 }
+
+.picture {
+    border-radius: 50%;
+}
