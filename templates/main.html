@@ -30,15 +30,18 @@
 <body>
 <div class="container">
     <div class="row titlebar">
-        <div class="col-xs-9 col-sm-10 col-md-9"><h1>Catalog App</h1></div>
-        <div class="col-xs-3 col-sm-2 col-md-3 h1 login-button">
+        <div class="col-xs-6 "><h1>Catalog App</h1></div>
+        <div class="col-xs-6 h1 login-button">
+            {% if login_session['state'] %}
+            <img src="{{picture}}"/>
+            <a id="Logout" href="{{url_for('logout',next=request.path)}}">Logout</a>
+            {% else %}
             <a href="#" id="LoginWithAmazon">
                 <img border="0" alt="Login with Amazon"
                      src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gry_195x46.png"
                      width="195" height="46"/>
             </a>
-            <img src="{{picture}}"/>
-            <a id="Logout">Logout</a>
+            {% endif %}
         </div>
     </div>
     <div class="row">
@@ -51,15 +54,15 @@
 <script type="text/javascript">
     document.getElementById('LoginWithAmazon').onclick = function () {
         options = {scope: 'profile'};
-        amazon.Login.authorize(options, 'http://127.0.0.1:8000/login');
+        amazon.Login.authorize(options, "{{url_for('login_redirect',next=request.path)}}");
         return false;
     };
 </script>
-   <script type="text/javascript">
-      document.getElementById('Logout').onclick = function() {
-         amazon.Login.logout();
-      };
-   </script>
+<script type="text/javascript">
+    document.getElementById('Logout').onclick = function () {
+        amazon.Login.logout();
+    };
+</script>
 <!-- Start Amazon OAuth2 JS -->
 
 </body>

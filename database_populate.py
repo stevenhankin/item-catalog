@@ -1,8 +1,6 @@
 """Populates database with initial data."""
 import time
 
-# from database_setup import User, Category, Item
-
 
 def add_car_items(session, category, user_id, Item):
     car_item1 = Item(user_id=user_id, category_id=category.id,
