@@ -48,7 +48,7 @@ def show_homepage():
 
 
 # For specified category, display all items
-@app.route('/category/<int:category_id>/items')
+@app.route('/categories/<int:category_id>/items')
 def show_category_items(category_id):
     """
     Displays all the items for the selected category
@@ -68,7 +68,7 @@ def show_category_items(category_id):
                            login_session=login_session)
 
 
-@app.route('/category/<int:category_id>/items/<int:item_id>')
+@app.route('/categories/<int:category_id>/items/<int:item_id>')
 def show_item_details(category_id, item_id):
     """
     Displays full description of an item
@@ -123,7 +123,7 @@ def login_redirect():
     if user is None:
         m = hashlib.md5()
         m.update(d['email'])
-        gravatar = 'https://secure.gravatar.com/avatar/' + m.hexdigest() + '?size=45'
+        gravatar = 'https://secure.gravatar.com/avatar/' + m.hexdigest() + '?size=35'
         user = User(name=d['name'], email=d['email'], picture=gravatar)
         session.add(user)
         session.commit()

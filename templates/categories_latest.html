@@ -2,12 +2,16 @@
 {% block items %}
 <div class="row">
     <div class="col-sm-12">
-        <h3>Latest {{max_items}} Items</h3>
+        <h3>Latest {{max_items}} Items
+        </h3>
     </div>
 </div>
 <div class="row">
     {% for item in latest_items %}
     <div class="col-sm-12">
+        {% if login_session['userid'] %}
+        <a href="#" data-toggle="tooltip" data-placement="left" title="Click to add"><span class="glyphicon glyphicon-plus-sign glyph" aria-hidden="true"></span></a>
+        {% endif %}
         {{item.item_name}} ({{item.category_name}})
     </div>
     {% endfor %}

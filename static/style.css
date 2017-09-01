@@ -8,7 +8,7 @@ body {
 }
 
 .titlebar {
-    background-color: lightblue;
+    border-bottom: 2px solid #dddddd;
     margin-bottom: 5px;
 }
 
@@ -23,3 +23,8 @@ body {
 .picture {
     border-radius: 50%;
 }
+
+.glyph {
+    color: red;
+}
+

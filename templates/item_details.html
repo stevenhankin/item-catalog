@@ -1,7 +1,13 @@
 {% extends "main.html" %}
 {% block body %}
 <div class="col-sm-12">
-    <h3>{{item_name}}</h3>
+    <h3>{{item.name}}
+        {% if login_session['userid'] %}
+        <a href="#" data-toggle="tooltip" data-placement="top" title="Edit item"><span class="glyphicon glyphicon-pencil glyph" aria-hidden="true"></span></a>
+        <a href="#" data-toggle="tooltip" data-placement="top" title="Delete item"><span class="glyphicon glyphicon-remove glyph" aria-hidden="true"></span></a>
+        {% endif %}
+
+    </h3>
     Description: {{item.description}}
 </div>
 {% endblock %}
