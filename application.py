@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, g, abort, flash, jsonify
-from sqlalchemy import asc, desc, text
-# from sqlalchemy.orm.exc import NoResultFound
-from database_setup import Base, User, Category, Item, session
+from sqlalchemy import asc
+from database_setup import User, Category, Item, session
 from flask import session as login_session
 from os import urandom
 from base64 import b64encode
@@ -12,7 +11,7 @@ import config
 import pycurl
 import urllib
 import json
-import StringIO
+from io import BytesIO
 
 app = Flask(__name__)
 app.secret_key = "\xc7\xc7\xf7\x80\x9b\xbb'\xd7\xa7\xe4\xa8\xd9\x7f\x03z)u&Z2c\xde\xf0\xd8"
@@ -29,8 +28,12 @@ def csrf_protect():
     if request.method == "POST":
         token = login_session.pop('_csrf_token', None)
         request_token = request.form.get('_csrf_token')
+        print("Comparing server token ["+token+"]")
+        print("with client token ["+request_token+"]")
         if not token or token != request_token:
+            print("Tokens do not match! Aborting..")
             abort(403)
+        print("Tokens match - accepted")
 
 
 def generate_csrf_token():
@@ -39,7 +42,8 @@ def generate_csrf_token():
     :return:
     """
     if '_csrf_token' not in login_session:
-        login_session['_csrf_token'] = b64encode(urandom(64))  # Cryptographically secure random key
+        login_session['_csrf_token'] = b64encode(urandom(64)).decode()  # Cryptographically secure random key
+    print ("_csrf_token:" + login_session['_csrf_token'])
     return login_session['_csrf_token']
 
 
@@ -60,20 +64,15 @@ def request_wants_json():
 def show_homepage():
     """
     Shows all the available categories and items
-    :return:
     """
     max_items = 5
+    session.flush()
     all_categories = session.query(Category).order_by(asc(Category.name)).all()
-    s = "select item.name as item_name, category.name as category_name, " \
-        " category.id as category_id " \
-        " from item" \
-        " join category on (item.category_id = category.id)" \
-        " order by ifnull(item.time_updated, item.time_created) DESC" \
-        " limit " + str(max_items)
-    latest_items = session.execute(s).fetchall()
+    items = session.query(Item, Category).join(Category).order_by(Item.time_updated.desc(), Item.time_created.desc(),
+                                                                  Item.name).limit(5).all()
     return render_template('categories_latest.html',
                            all_categories=all_categories,
-                           latest_items=latest_items,
+                           items=items,
                            max_items=max_items,
                            login_session=login_session)
 
@@ -83,8 +82,6 @@ def show_homepage():
 def show_category_items(category_id):
     """
     Displays all the items for the selected category
-    :param category_id:
-    :return:
     """
     all_categories = session.query(Category).order_by(asc(Category.name)).all()
     category = session.query(Category).filter(Category.id == category_id).first()
@@ -97,11 +94,6 @@ def show_category_items(category_id):
                            items=items,
                            item_count=item_count,
                            login_session=login_session)
-
-
-@app.route('/csrf_simulation')
-def csrf_simulation():
-    return render_template('csrf_simulation.html')
 
 
 @app.route('/categories/<int:category_id>/items/<int:item_id>')
@@ -145,7 +137,7 @@ def asset_user_is_creator(item_id):
     :return: The item + user record
     """
     # User must be logged in for GET and POST
-    if not login_session.has_key('userid'):
+    if not 'userid' in login_session:
         abort(403, 'Unfortunately you need to be logged in to make changes')
     item = session.query(Item, User).join(User).filter(Item.id == item_id).first()
     # For existing items, user must be item creator
@@ -182,6 +174,7 @@ def save_item(item, item_id):
         item.Item.name = request.form['title']
         item.Item.description = request.form['description']
         item.Item.category_id = request.form['category']
+        session.add(item.Item)
         session.commit()
         flash("Updated " + item.Item.name)
         return render_template('item_details.html', item=item, login_session=login_session)
@@ -277,7 +270,7 @@ def amazon_authorization(access_token):
     :param access_token: Access token provided by Amazon callback
     :return: Object containing user credentials if authenticated
     """
-    b = StringIO.StringIO()
+    b = BytesIO()
     # verify that the access token belongs to us
     c = pycurl.Curl()
     c.setopt(pycurl.URL, "https://api.amazon.com/auth/o2/tokeninfo?access_token=" + urllib.quote_plus(access_token))
@@ -290,7 +283,7 @@ def amazon_authorization(access_token):
         raise BaseException("Invalid Token")
 
     # exchange the access token for user profile
-    b = StringIO.StringIO()
+    b = BytesIO()
     c = pycurl.Curl()
     c.setopt(pycurl.URL, "https://api.amazon.com/user/profile")
     c.setopt(pycurl.HTTPHEADER, ["Authorization: bearer " + access_token])

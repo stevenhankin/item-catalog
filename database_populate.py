@@ -76,12 +76,16 @@ def add_categories(session, user_id, Category, Item):
 
 
 def populate(session, User, Category, Item):
-    print "in populate: Session is "+str(session)
+    """
+    Populate schema with test data
+    :return:
+    """
     # Create user and associated records
-    User1 = User(name="Steven Hankin",
+    print ("Populating tables...")
+    user1 = User(name="Steven Hankin",
                  email="steven.hankin@gmail.com",
                  picture="https://secure.gravatar.com/avatar/bbed4d2a6f627e45d8de9ed6e0c0a468?size=35")
-    session.add(User1)
+    session.add(user1)
     session.commit()
-    print "Creating categories..."
-    add_categories(session, User1.id, Category, Item)
+    add_categories(session, user1.id, Category, Item)
+    print ("Finished populating.")
