@@ -20,7 +20,11 @@ Follow these steps to deploy:
 * Create an account on [Amazon Login](https://developer.amazon.com/lwa/sp/overview.html)
 * Use your 
 * Create an account and application on [Heroku](https://dashboard.heroku.com/apps)
-
+** New -> Create new app
+** Choose an app name and region, then Create app
+** Deployment method: Use Heroku CLI
+** Follow the remaining steps
+* Should be able to run "heroku local" to test a local instance before deploying using "git push heroku"
 
 ## Running in Vagrant
 * cd vagrant

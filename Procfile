@@ -1,2 +1,2 @@
-web: gunicorn application:app --chdir vagrant/catalog
+web: gunicorn application:app
 

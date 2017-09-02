@@ -3,3 +3,4 @@ itemcategories.db
 .idea/
 \#*\#
 .\#*
+*.pyc
