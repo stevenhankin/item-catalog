@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block body %}
+    <div class="row h3">
+        Delete Item?
+    </div>
+
+
+    Are you sure you want to delete {{ item_name }}?
+    This cannot be undone!
+
+    <form action="{{ url_for('delete_item_details',item_id=item_id) }}" method="POST" class="form-horizontal">
+        <div class="row h3">
+            <div class="col-sm-offset-2 col-sm-2">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+            <div class="col-sm-2">
+                {# On Cancel, return user to previous page #}
+                <a href="{{ request.referrer }}">
+                    <button type="button" class="btn btn-default">&lt&lt Cancel</button>
+                </a>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

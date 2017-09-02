@@ -1,38 +1,47 @@
 {% extends "main.html" %}
 {% block body %}
-<div class="row">
-    <div class="col-sm-12">
+    <div class="row">
+        <div class="col-sm-12">
 
-        <div class="row">
-            <div class="col-sm-4 h3">
-                {{item.Item.name}}
+            <div class="row">
+                <div class="col-sm-4 h3">
+                    {{ item.Item.name }}
+                </div>
+
+                {% if login_session['userid'] %}
+                    <div class="col-sm-1 h3">
+                        <a href="{{ url_for('edit_item_details',item_id=item.Item.id) }}" data-toggle="tooltip"
+                           data-placement="top" title="Edit item">
+                            <span class="glyphicon glyphicon-pencil glyph" aria-hidden="true"></span>
+                        </a>
+                    </div>
+
+                    <div class="col-sm-1 h3">
+                        <a href="{{ url_for('delete_item_details',item_id=item.Item.id) }}" data-toggle="tooltip" data-placement="top" title="Delete item">
+                            <span class="glyphicon glyphicon-trash glyph" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
 
-            {% if login_session['userid'] %}
-            <div class="col-sm-1 h3">
-                <a href="{{url_for('edit_item_details',item_id=item.Item.id)}}" data-toggle="tooltip"
-                   data-placement="top" title="Edit item">
-                    <span class="glyphicon glyphicon-pencil glyph" aria-hidden="true"></span>
-                </a>
+            <div class="row">
+                <div class="col-sm-6">Description: {{ item.Item.description }}</div>
             </div>
 
-            <div class="col-sm-1 h3">
-                <a href="#" data-toggle="tooltip" data-placement="top" title="Delete item">
-                    <span class="glyphicon glyphicon-trash glyph" aria-hidden="true"></span>
-                </a>
+            <div class="row">
+                <div class="col-sm-6">Created by {{ item.User.name }} on {{ item.Item.time_created }}</div>
             </div>
-            {% endif %}
-        </div>
 
-        <div class="row">
-            <div class="col-sm-6">Description: {{item.Item.description}}</div>
-        </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    {% if item.Item.time_updated %} Last updated on {{ item.Item.time_updated }}
+                    {% else %}
+                        Never updated
+                    {% endif %}
+                </div>
+            </div>
 
-        <div class="row">
-            <div class="col-sm-6">Created by {{item.User.name}} on {{item.Item.time_created}}</div>
         </div>
-
     </div>
-</div>
 
 {% endblock %}

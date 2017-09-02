@@ -1,17 +1,14 @@
 {% extends "categories_parent.html" %}
 {% block items %}
 <div class="row">
-    <div class="col-sm-12">
-        <h3>Latest {{max_items}} Items
-        </h3>
+    <div class="col-sm-3 h2">Latest {{max_items}} Items</div>
+    <div class="col-sm-3 h2">
+        <a href="{{ url_for('edit_item_details',item_id=0) }}"><button class="btn-sm btn-primary">Create Item</button></a>
     </div>
 </div>
 <div class="row">
     {% for item in latest_items %}
     <div class="col-sm-12">
-        {% if login_session['userid'] %}
-        <a href="#" data-toggle="tooltip" data-placement="left" title="Click to add"><span class="glyphicon glyphicon-plus-sign glyph" aria-hidden="true"></span></a>
-        {% endif %}
         {{item.item_name}} ({{item.category_name}})
     </div>
     {% endfor %}

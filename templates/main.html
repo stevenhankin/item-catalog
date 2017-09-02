@@ -45,24 +45,46 @@
 <div class="container">
     <div class="row titlebar">
         <div class="col-xs-6 ">
-            <img src="{{ url_for('static', filename='catalog_logo.png') }}" width="243" height="35"/>
+            <a href="{{ url_for('show_homepage') }}">
+                <img src="{{ url_for('static', filename='catalog_logo.png') }}" width="243" height="35"/>
+            </a>
         </div>
         <div class="col-xs-6 login-button">
-            {% if login_session['userid'] %}
-            <img class="picture" src="{{login_session['picture']}}"/>
-            <a id="Logout" class="h6" href="{{url_for('logout',next=request.path)}}">Not {{login_session['name']}}? Sign
-                Out</a>
-            {% else %}
-            <a href="#" id="LoginWithAmazon">
+
+            <img class="picture" src="{{ login_session['picture'] }}"
+                    {% if not login_session['userid'] %} class="hidden" {% endif %} />
+
+            <div class=" {% if not login_session['userid'] %} hidden {% endif %}">
+                <a id="Logout" class="h6"
+                   href="{{ url_for('logout',next=request.path) }}">Not {{ login_session['name'] }}? Sign Out</a>
+            </div>
+
+            <a href="#" id="LoginWithAmazon"
+                    {% if login_session['userid'] %} class="hidden" {% endif %} >
                 <img border="0" alt="Login with Amazon"
                      src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gry_195x46.png"
                      width="195" height="46"/>
             </a>
-            {% endif %}
+
         </div>
     </div>
+
     {% block body %}
     {% endblock %}
+
+    {# Display user message if raised #}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="flash-message">{{ message }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
 </div>
 
 <!-- Start Amazon OAuth2 JS -->
@@ -84,6 +106,15 @@
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+
+<!-- Fade in/out flash messages -->
+<script>
+    $(function () {
+        $('.flash-message').delay(500).fadeIn('normal', function () {
+            $(this).delay(2500).fadeOut();
+        });
     });
 </script>
 
