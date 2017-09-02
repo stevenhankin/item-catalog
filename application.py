@@ -4,6 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from database_setup import Base, User, Category, Item, session
 from flask import session as login_session
 
+
 import hashlib
 
 import config
@@ -73,28 +74,31 @@ def show_item_details(category_id, item_id):
 @app.route('/items/<int:item_id>/delete', methods=['POST', 'GET'])
 def delete_item_details(item_id):
     item = asset_user_is_creator(item_id)
-
     item_name = item.Item.name
-
     if request.method == 'GET':
         return render_template('item_delete_confirm.html', item_name=item_name, item_id=item_id,
                                login_session=login_session)
     else:
-        delete_item = session.query(Item).filter(Item.id == item_id).one()
-        session.delete(delete_item)
+        session.delete(item.Item)
         session.commit()
         flash(item_name + " deleted")
         return redirect(url_for('show_homepage'))
 
 
 def asset_user_is_creator(item_id):
+    """
+    Utility to verify that the logged in user
+    is also the creator of the target item
+    :param item_id:
+    :return: The item + user record
+    """
     # User must be logged in for GET and POST
     if not login_session.has_key('userid'):
-        abort(403)
+        abort(403, 'Unfortunately you need to be logged in to make changes')
     item = session.query(Item, User).join(User).filter(Item.id == item_id).first()
     # For existing items, user must be item creator
     if item and item.Item.user_id != login_session['userid']:
-        abort(403)
+        abort(403, 'Unfortunately this item was not created by you')
     return item
 
 
@@ -104,9 +108,7 @@ def edit_item_details(item_id):
     item_id >= 1  =>  UPDATE item  (if user is original creator)
     item_id == 0  =>  CREATE item
     """
-
     item = asset_user_is_creator(item_id)
-
     if request.method == 'GET':
         categories = session.query(Category).order_by(asc(Category.name)).all()
         return display_item(categories, item, item_id)
