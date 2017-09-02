@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, g
+from flask import Flask, render_template, request, redirect, url_for, g, abort
 from sqlalchemy import asc, desc, text
 from sqlalchemy.orm.exc import NoResultFound
 from database_setup import Base, User, Category, Item, session
@@ -81,10 +81,40 @@ def show_item_details(category_id, item_id):
     print "item_id " + str(item_id)
     # all_categories = session.query(Category).order_by(asc(Category.name)).all()
     # category = session.query(Category).filter(Category.id == category_id).first()
-    item = session.query(Item).filter(Item.id == item_id).one()
+    item = session.query(Item, User).join(User).filter(Item.id == item_id).one()
     # item_count = items.count()
-    print item.description
-    return render_template('item_details.html', item=item,login_session=login_session)
+    print item.Item.description
+    return render_template('item_details.html', item=item, login_session=login_session)
+
+
+@app.route('/items/<int:item_id>/edit', methods=['POST', 'GET'])
+def edit_item_details(item_id):
+    """
+    Edit item details IF user originally created the item
+    :param item_id:
+    :return:
+    """
+
+    print "Login session is..."
+    print login_session
+
+    # User must be logged in for GET and POST
+    if not login_session.has_key('userid'):
+        abort(403)
+
+    item = session.query(Item, User).join(User).filter(Item.id == item_id).one()
+
+    print "item creator "+str(item.Item.user_id)+", current user "+str(login_session['userid'])
+    # User must be item creator
+    if item.Item.user_id != login_session['userid']:
+        abort(403)
+
+    categories = session.query(Category).order_by(asc(Category.name)).all()
+
+    if request.method == 'GET':
+        return render_template('item_details_edit.html', item=item, categories=categories, login_session=login_session)
+    if request.method == 'POST':
+        return 'Ok!!'
 
 
 def redirect_dest(fallback):

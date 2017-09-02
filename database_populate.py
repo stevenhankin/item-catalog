@@ -76,15 +76,12 @@ def add_categories(session, user_id, Category, Item):
 
 
 def populate(session, User, Category, Item):
-
     print "in populate: Session is "+str(session)
     # Create user and associated records
     User1 = User(name="Steven Hankin",
-                 email="steven.hankin@hmail.com",
+                 email="steven.hankin@gmail.com",
                  picture="https://secure.gravatar.com/avatar/bbed4d2a6f627e45d8de9ed6e0c0a468?size=35")
     session.add(User1)
     session.commit()
     print "Creating categories..."
     add_categories(session, User1.id, Category, Item)
-
-
