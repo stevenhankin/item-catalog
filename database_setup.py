@@ -19,6 +19,9 @@ class User(Base):
     email = Column(String(250), nullable=False, unique=True)
     picture = Column(String(250))
 
+    def to_json(self):
+        return {"user": {"id": self.id, "name": self.name, "email": self.email, "picture": self.picture}}
+
 
 class Category(Base):
     """Category groups together related items."""
@@ -28,6 +31,9 @@ class Category(Base):
     name = Column(String(80), nullable=False, unique=True)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+
+    def to_json(self):
+        return {"category": {"id": self.id, "name": self.name, "user_id": self.user_id}}
 
 
 class Item(Base):
@@ -43,6 +49,11 @@ class Item(Base):
     description = Column(String(4000), nullable=False)
     time_created = Column(DATETIME(fsp=6), server_default=func.now())
     time_updated = Column(DATETIME(timezone=True, fsp=6), onupdate=func.now())
+
+    def to_json(self):
+        return {"item": {"id": self.id, "name": self.name, "category_id": self.category_id, "user_id": self.user_id,
+                         "description": self.description, "timeCreated": self.time_created,
+                         "timeUpdated": self.time_updated}}
 
 
 # engine = create_engine('sqlite:///itemcategories.db')
@@ -65,4 +76,3 @@ session = DBSession()
 Base.metadata.create_all(engine)
 
 populate(session, User, Category, Item)
-

