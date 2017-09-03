@@ -4,7 +4,6 @@
         Delete Item?
     </div>
 
-
     Are you sure you want to delete {{ item_name }}?
     This cannot be undone!
 
@@ -12,7 +11,7 @@
         <div class="row h3">
             <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
             <div class="col-sm-offset-2 col-sm-2">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <button class="btn btn-danger">Delete</button>
             </div>
             <div class="col-sm-2">
                 {# On Cancel, return user to previous page #}

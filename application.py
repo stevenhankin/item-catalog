@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, g, abort, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, abort, flash, jsonify
 from sqlalchemy import asc
 from database_setup import User, Category, Item, session
 from flask import session as login_session
@@ -28,8 +28,8 @@ def csrf_protect():
     if request.method == "POST":
         token = login_session.pop('_csrf_token', None)
         request_token = request.form.get('_csrf_token')
-        print("Comparing server token ["+token+"]")
-        print("with client token ["+request_token+"]")
+        print("Comparing server token [" + token + "]")
+        print("with client token [" + request_token + "]")
         if not token or token != request_token:
             print("Tokens do not match! Aborting..")
             abort(403)
@@ -53,11 +53,8 @@ def request_wants_json():
     and then either render a page or return the jsonified results
     :return: true if JSON wanted instead of HTML
     """
-    best = request.accept_mimetypes \
-        .best_match(['application/json', 'text/html'])
-    return best == 'application/json' and \
-           request.accept_mimetypes[best] > \
-           request.accept_mimetypes['text/html']
+    best = request.accept_mimetypes.best_match(['application/json', 'text/html'])
+    return best == 'application/json' and request.accept_mimetypes[best] > request.accept_mimetypes['text/html']
 
 
 @app.route('/')
@@ -83,7 +80,6 @@ def show_category_items(category_id):
     """
     Displays all the items for the selected category
     """
-    all_categories = session.query(Category).order_by(asc(Category.name)).all()
     category = session.query(Category).filter(Category.id == category_id).first()
     items = session.query(Item).filter(Item.category_id == category_id)
     item_count = items.count()
@@ -96,8 +92,8 @@ def show_category_items(category_id):
                            login_session=login_session)
 
 
-@app.route('/categories/<int:category_id>/items/<int:item_id>')
-def show_item_details(category_id, item_id):
+@app.route('/categories/items/<int:item_id>')
+def show_item_details(item_id):
     """
     Displays full description of an item
     """
@@ -137,7 +133,7 @@ def asset_user_is_creator(item_id):
     :return: The item + user record
     """
     # User must be logged in for GET and POST
-    if not 'userid' in login_session:
+    if 'userid' not in login_session:
         abort(403, 'Unfortunately you need to be logged in to make changes')
     item = session.query(Item, User).join(User).filter(Item.id == item_id).first()
     # For existing items, user must be item creator
@@ -217,12 +213,12 @@ def display_item(categories, item, item_id):
 
 
 def redirect_dest(fallback):
-    dest = request.args.get('next')
+    destination = request.args.get('next')
     try:
-        dest_url = url_for(dest)
-    except:
+        destination_url = url_for(destination)
+    except RuntimeError:
         return redirect(fallback)
-    return redirect(dest_url)
+    return redirect(destination_url)
 
 
 @app.route('/logout')
