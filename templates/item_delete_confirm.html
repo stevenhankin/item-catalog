@@ -1,15 +1,20 @@
 {% extends "main.html" %}
 {% block body %}
     <div class="row h3">
-        Delete Item?
+        <div class="col-sm-12">
+            Delete Item
+        </div>
     </div>
-
-    Are you sure you want to delete {{ item_name }}?
-    This cannot be undone!
+    <div class="row">
+        <div class="col-sm-12">
+            <h5>Are you sure you want to delete {{ item_name }}?
+                This cannot be undone!</h5>
+        </div>
+    </div>
 
     <form action="{{ url_for('delete_item_details',item_id=item_id) }}" method="POST" class="form-horizontal">
         <div class="row h3">
-            <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+            <input name=_csrf_token type=hidden value="{{ csrf_token }}">
             <div class="col-sm-offset-2 col-sm-2">
                 <button class="btn btn-danger">Delete</button>
             </div>

@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, flash, jsonify
-from sqlalchemy import asc
+from sqlalchemy import asc, func
 from database_setup import User, Category, Item, session
 from flask import session as login_session
 from werkzeug.routing import BuildError
 from os import urandom
 from base64 import b64encode
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 import hashlib
 
@@ -17,6 +19,12 @@ from io import BytesIO
 app = Flask(__name__)
 app.secret_key = "\xc7\xc7\xf7\x80\x9b\xbb'\xd7\xa7\xe4\xa8\xd9\x7f\x03z)u&Z2c\xde\xf0\xd8"
 app.config['SESSION_TYPE'] = 'filesystem'
+
+# API Rate Limit configuration
+limiter = Limiter(
+    app,
+    key_func=get_remote_address
+)
 
 
 @app.before_request
@@ -64,10 +72,11 @@ def show_homepage():
     Shows all the available categories and items
     """
     max_items = 5
-    session.flush()
-    all_categories = session.query(Category).order_by(asc(Category.name)).all()
+    all_categories = session.execute(
+        'SELECT category.name, category.id, count(item.id) AS item_count FROM category LEFT JOIN item ON category.id = item.category_id GROUP BY category.name, category_id')
     items = session.query(Item, Category).join(Category).order_by(Item.time_updated.desc(), Item.time_created.desc(),
                                                                   Item.name).limit(5).all()
+
     return render_template('categories_latest.html',
                            all_categories=all_categories,
                            items=items,
@@ -75,22 +84,44 @@ def show_homepage():
                            login_session=login_session)
 
 
-# For specified category, display all items
 @app.route('/categories/<int:category_id>/items')
 def show_category_items(category_id):
     """
-    Displays all the items for the selected category
+    Displays all the items for the specified category
     """
+    all_categories = session.execute(
+        'SELECT category.name, category_id, count(item.id) AS item_count FROM category LEFT JOIN item ON category.id = item.category_id GROUP BY category.name, category_id')
     category = session.query(Category).filter(Category.id == category_id).first()
     items = session.query(Item).filter(Item.category_id == category_id)
     item_count = items.count()
-    if request_wants_json():
-        return jsonify(json_list=[i.to_json() for i in items.all()])
     return render_template('category_items.html',
+                           all_categories=all_categories,
                            category=category,
                            items=items,
                            item_count=item_count,
                            login_session=login_session)
+
+
+@app.route('/api/categories/<int:category_id>/items')
+@limiter.limit("100/hour")
+@limiter.limit("2/minute")
+def api_category_items(category_id):
+    """
+    Rate-limited JSON API to retrieve items for a specified category
+    """
+    items = session.query(Item).filter(Item.category_id == category_id)
+    return jsonify(json_list=[i.to_json() for i in items.all()])
+
+
+@app.route('/api/categories/items/<int:item_id>')
+@limiter.limit("100/hour")
+@limiter.limit("2/minute")
+def api_item_details(item_id):
+    """
+    Displays full description of an item
+    """
+    item = session.query(Item, User).join(User).filter(Item.id == item_id).one()
+    return jsonify(item.Item.to_json())
 
 
 @app.route('/categories/items/<int:item_id>')
@@ -99,33 +130,10 @@ def show_item_details(item_id):
     Displays full description of an item
     """
     item = session.query(Item, User).join(User).filter(Item.id == item_id).one()
-    if request_wants_json():
-        return jsonify(item.to_json())
     return render_template('item_details.html', item=item, login_session=login_session)
 
 
-@app.route('/items/<int:item_id>/delete', methods=['POST', 'GET'])
-def delete_item_details(item_id):
-    """
-    Delete item for specified ID
-    CSRF Token regenerated for each new page
-    :param item_id:
-    :return:
-    """
-    item = asset_user_is_creator(item_id)
-    item_name = item.Item.name
-    if request.method == 'GET':
-        return render_template('item_delete_confirm.html', item_name=item_name, item_id=item_id,
-                               login_session=login_session,
-                               csrf_token=generate_csrf_token())
-    else:
-        session.delete(item.Item)
-        session.commit()
-        flash(item_name + " deleted")
-        return redirect(url_for('show_homepage'))
-
-
-def asset_user_is_creator(item_id):
+def is_user_the_creator(item_id):
     """
     Return Item for specified ID if logged in
     user is also the creator of the target item
@@ -143,6 +151,27 @@ def asset_user_is_creator(item_id):
     return item
 
 
+@app.route('/items/<int:item_id>/delete', methods=['POST', 'GET'])
+def delete_item_details(item_id):
+    """
+    Delete item for specified ID
+    CSRF Token regenerated for each new page
+    :param item_id:
+    :return:
+    """
+    item = is_user_the_creator(item_id)
+    item_name = item.Item.name
+    if request.method == 'GET':
+        return render_template('item_delete_confirm.html', item_name=item_name, item_id=item_id,
+                               login_session=login_session,
+                               csrf_token=generate_csrf_token())
+    else:
+        session.delete(item.Item)
+        session.commit()
+        flash(item_name + " deleted")
+        return redirect(url_for('show_homepage'))
+
+
 @app.route('/items/<int:item_id>/edit', methods=['POST', 'GET'])
 def edit_item_details(item_id):
     """
@@ -150,7 +179,7 @@ def edit_item_details(item_id):
     item_id >= 1  =>  UPDATE item  (if user is original creator)
     item_id == 0  =>  CREATE item
     """
-    item = asset_user_is_creator(item_id)
+    item = is_user_the_creator(item_id)
     if request.method == 'GET':
         categories = session.query(Category).order_by(asc(Category.name)).all()
         return display_item(categories, item, item_id)
@@ -216,7 +245,6 @@ def display_item(categories, item, item_id):
 def redirect_dest(fallback):
     destination = request.args.get('next')
     try:
-        print destination
         destination_url = url_for(destination)
     except BuildError:
         return redirect(fallback)

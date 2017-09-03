@@ -5,7 +5,7 @@ body {
 
 .container {
     border: 2px solid #dddddd;
-    padding-bottom: 10px;
+    /*padding-bottom: 10px;*/
 }
 
 .titlebar {
@@ -14,12 +14,21 @@ body {
     padding: 10px 0 10px 0;
 }
 
-.category-list {
-    border-right: 2px solid #dddddd;
+/*.category-list {*/
+    /*border-right: 2px solid #dddddd;*/
+    /*height: 100%;*/
+/*}*/
+
+.category-items {
+    border-left: 2px solid #dddddd;
 }
 
 .login-button {
     text-align: right;
+}
+
+.login-button img {
+    float: right;
 }
 
 .picture {
@@ -34,4 +43,39 @@ body {
     background-color: wheat;
     text-align: center;
     margin-top: 10px;
+}
+
+@media only screen and (max-width: 767px) {
+    /* For mobile phones: */
+    #logout-text {
+        display: none;
+    }
+
+    #LargeAmazonButton {
+        display: none;
+    }
+
+    #SmallAmazonButton {
+        display: block;
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    /* For screens wider than phone vertical display: */
+    #logout-text {
+        display: block;
+        padding: 8px 40px 0 0;
+    }
+
+    #LargeAmazonButton {
+        display: block;
+    }
+
+    #SmallAmazonButton {
+        display: none;
+    }
+}
+
+.moo {
+    height: 100%;
 }

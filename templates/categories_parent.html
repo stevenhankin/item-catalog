@@ -1,27 +1,30 @@
 {% extends "main.html" %}
 {% block body %}
-<div class="col-md-2 col-sm-4 col-xs-5 category-list">
     <div class="row">
-        <div class="col-md-12">
-            <h3>Categories</h3>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="btn-group-vertical btn-group-md" role="group">
-                {% for category in all_categories %}
-                <a class="btn btn-primary"
-                   href="{{ url_for('show_category_items',category_id=category.id) }}">{{category.name}}</a>
-                {% endfor %}
+
+        <div class="col-md-2 col-sm-4 col-xs-5 category-list">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Categories</h3>
+                </div>
             </div>
+
+            {% for category in all_categories %}
+                <div class="row">
+                    <div class="col-sm-12 h4">
+                        <a href="{{ url_for('show_category_items',category_id=category[1]) }}">{{ category[0] }} <span
+                                class="badge">{{ category[2] }}</span>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-9 col-sm-7 col-xs-6 category-items">
+            {% block items %}
+            {% endblock %}
         </div>
     </div>
-</div>
-
-<div class="col-md-10 col-sm-8 col-xs-7">
-    {% block items %}
-    {% endblock %}
-</div>
 {% endblock %}
 
