@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, abort, fla
 from sqlalchemy import asc
 from database_setup import User, Category, Item, session
 from flask import session as login_session
+from werkzeug.routing import BuildError
 from os import urandom
 from base64 import b64encode
 
@@ -215,8 +216,9 @@ def display_item(categories, item, item_id):
 def redirect_dest(fallback):
     destination = request.args.get('next')
     try:
+        print destination
         destination_url = url_for(destination)
-    except RuntimeError:
+    except BuildError:
         return redirect(fallback)
     return redirect(destination_url)
 
