@@ -7,13 +7,17 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <!-- Latest compiled and minified CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- Optional theme -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cerulean/bootstrap.min.css" rel="stylesheet" integrity="sha384-zF4BRsG/fLiTGfR9QL82DrilZxrwgY/+du4p/c7J72zZj+FLYq4zY00RylP9ZjiT" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cerulean/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-zF4BRsG/fLiTGfR9QL82DrilZxrwgY/+du4p/c7J72zZj+FLYq4zY00RylP9ZjiT" crossorigin="anonymous">
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
 
     <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
 
@@ -48,40 +52,50 @@
         <div class="col-sm-6 col-xs-2 login-button pull-right">
 
             <div class=" {% if not login_session['userid'] %} hidden {% endif %}">
-            <img class="picture" src="{{ login_session['picture'] }}"
-                    {% if not login_session['userid'] %} class="hidden" {% endif %} />
+                <!-- User can click profile image to see profile -->
+                <a href="{{ url_for('show_profile') }}">
+                    <img class="img-responsive img-circle" src="{{ login_session['picture'] }}"
+                    />
+                </a>
             </div>
             <div id="logout-text" class=" {% if not login_session['userid'] %} hidden {% endif %}">
                 <a id="Logout" class="h6"
-                   href="{{ url_for('logout',next=request.path) }}">Not {{ login_session['name'] }}? Sign Out</a>
+                   href="{{ url_for('logout_redirect',next=request.path) }}">Not {{ login_session['name'] }}? Sign
+                    Out</a>
             </div>
-
             <a href="#" id="LoginWithAmazon"
                     {% if login_session['userid'] %} class="hidden" {% endif %} >
                 <img id="LargeAmazonButton"
-                        border="0" alt="Login with Amazon"
+                     border="0" alt="Login with Amazon"
                      src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gry_195x46.png"
                      width="195" height="46"/>
                 <img id="SmallAmazonButton"
-                        border="0" alt="Login with Amazon"
+                     border="0" alt="Login with Amazon"
                      src="https://images-na.ssl-images-amazon.com/images/G/01/lwa/btnLWA_gry_32x32.png"
                      width="32" height="32"/>
-
             </a>
-
         </div>
     </div>
+
+    {% if 'userid' not in login_session %}
+        <div class="jumbotron">
+            <h1>Welcome to Catalog App!</h1>
+            <h3>Once you have logged in you will be able to make modifications</h3>
+            <h3>Additionally, by clicking on your profile picture, you will have access to the API</h3>
+            {#  <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>#}
+        </div>
+    {% endif %}
 
     {% block body %}
     {% endblock %}
 
     {# Display user message if raised #}
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for message in messages %}
+            {% for category, message in messages %}
                 <div class="row">
                     <div class="col-sm-12">
-                        <div class="flash-message">{{ message }}</div>
+                        <div class="flash-message {{ category }}">{{ message }}</div>
                     </div>
                 </div>
             {% endfor %}

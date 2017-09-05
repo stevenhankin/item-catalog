@@ -1,26 +1,43 @@
 # Catalog
-Catalog is a web app that supports the categorisation of items for perusal.  It demonstrates front-end/mid-tier/database coupling.
+Catalog is a web app that supports the categorisation of items for perusal (or modification if authenticated), and includes a rate-limited JSON API.
 
 The application is a project from Udacity's [Full Stack Web Developer](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004) course.
-
 
 ### Features
 * Amazon Login authentication
 * CSRF protection
 * API rate limiting
-
+* Responsive design
+* Heroku [demo site](https://hankste-catalog.herokuapp.com/)
 
 ## Pre-requisites
 * [Python v2.7](https://www.python.org/downloads/)
 
 
+## File list
+* Procfile - __Heroku application startup method__
+* README.md
+* Vagrantfile - __Vagrant build file__
+* application.py - __Main application entry__
+* config.py - __Configuration parameters__
+* database__populate.py - __Generate initial test data__
+* database__setup.py - __Creates base schema. Called at application startup-up__
+* requirements.txt - __Python requirements in Vagrant VM__
+* runtime.txt - __Heroku runtime engine requirement__
+* static/ - __Images, stylesheets__
+* templates/ - __Flask view templates__
+* test/ - __Contains example CSRF test__
+* vagrant__bootstrap.sh - __Installs Python Libraries and other software when VM is provisioned__
+
+
 ## Installation
-Can deploy to 3 different target environments, in order of suggested preference.
+Deploys to 3 different target environments, detailed below in order of suggested preference.
 
 Local VM is most recommended since it will isolate the installation and configurations.  
 
 Heroku is least recommended due to sqlite data layer; Sqlite is not reliable in such an environment and Postgres should be used instead (as a Heroku Addon). 
 The database in this project is setup in-memory, but this does result in more that one instance in the application which can make changes appear to come and go.
+
 ####1. Local VM
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vagrant](https://www.vagrantup.com/downloads.html)
 2. Run the following:
@@ -57,13 +74,14 @@ git push heroku master
 4. Access the application from the Heroku console using the "Open app" button
 
 
-## Enabling Amazon Authentication
+## Enabling 3rd Party OAuth (Amazon Authentication)
 If you want users to login (which is required for modifications), then you'll need an Amazon Login account.
 * Create an account on [Amazon Login](https://developer.amazon.com/lwa/sp/overview.html)
 * Under the Security Profile / Web Settings:
   * Set Allowed Origins to be your machine's application web address  (e.g. https://hankste-catalog.herokuapp.com)
   * Set Allowed Return URLs to be the /login route (e.g. https://hankste-catalog.herokuapp.com/login)
 * Set YOUR_CLIENT_ID in config.py to match your Amazon Client ID (also under the Web Settings)
+
 
 
 ## Developer API

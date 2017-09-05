@@ -11,16 +11,19 @@ Base = declarative_base()
 
 
 class User(Base):
-    """Application user for a (logged-in) session."""
+    """Application user for a (logged-in) session.
+    The Amazon User ID is unique for the user + application """
 
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False, unique=True)
     picture = Column(String(250))
+    client_id = Column(String(250))
 
     def to_json(self):
-        return {"user": {"id": self.id, "name": self.name, "email": self.email, "picture": self.picture}}
+        return {"user": {"id": self.id, "name": self.name, "email": self.email, "picture": self.picture,
+                         "amazon_id": self.client_id}}
 
 
 class Category(Base):
@@ -76,5 +79,3 @@ session = DBSession()
 Base.metadata.create_all(engine)
 
 populate(session, User, Category, Item)
-
-

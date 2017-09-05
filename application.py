@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, flash, jsonify
-from sqlalchemy import asc, func
+from sqlalchemy import asc, exists
 from database_setup import User, Category, Item, session
 from flask import session as login_session
 from werkzeug.routing import BuildError
@@ -27,14 +27,40 @@ limiter = Limiter(
 )
 
 
+class InvalidUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    # response = jsonify(error.to_dict())
+    # response.status_code = error.status_code
+    # return response
+    flash(error.message, 'error')
+    return redirect(url_for('show_homepage'))
+
+
 @app.before_request
 def csrf_protect():
     """
     Intercept POST requests and check the token
+    (if it's not an API request)
     See http://flask.pocoo.org/snippets/3/
     :return:
     """
-    if request.method == "POST":
+    if request.method == "POST" and request.path[0:5] != "/api/":
         token = login_session.pop('_csrf_token', None)
         request_token = request.form.get('_csrf_token')
         print("Comparing server token [" + token + "]")
@@ -45,10 +71,32 @@ def csrf_protect():
         print("Tokens match - accepted")
 
 
+@app.before_request
+def ensure_user_in_database():
+    """
+    If app has been restarted and user still has a session
+    it might be necessary to recreate the user in the
+    database (especially if using in-memory database)
+    """
+    if 'email' in login_session:
+        user_exists = session.query(exists().where(User.email == login_session['email'])).scalar()
+        if not user_exists:
+            user = User(
+                id=login_session['userid'],
+                picture=login_session['picture'],
+                name=login_session['name'],
+                email=login_session['email'],
+                client_id=login_session['client_id']
+            )
+            session.add(user)
+            session.commit()
+            print("Recreated user in database")
+
+
 def generate_csrf_token():
     """
     Generate CSRF token on new pages
-    :return:
+    :return: The token
     """
     if '_csrf_token' not in login_session:
         login_session['_csrf_token'] = b64encode(urandom(64)).decode()  # Cryptographically secure random key
@@ -73,15 +121,42 @@ def show_homepage():
     """
     max_items = 5
     all_categories = session.execute(
-        'SELECT category.name, category.id, count(item.id) AS item_count FROM category LEFT JOIN item ON category.id = item.category_id GROUP BY category.name, category_id')
+        'SELECT category.name, category.id, count(item.id) AS item_count '
+        'FROM category '
+        'LEFT JOIN item ON category.id = item.category_id '
+        'GROUP BY category.name, category_id')
     items = session.query(Item, Category).join(Category).order_by(Item.time_updated.desc(), Item.time_created.desc(),
                                                                   Item.name).limit(5).all()
-
     return render_template('categories_latest.html',
                            all_categories=all_categories,
                            items=items,
                            max_items=max_items,
                            login_session=login_session)
+
+
+@app.route('/logout')
+def logout_redirect():
+    """
+    Redirect to home page and confirm logout to user
+    """
+    login_session.clear()
+    flash('You have logged out')
+    return redirect(url_for('show_homepage'))
+
+
+@app.route('/profile')
+def show_profile():
+    """
+    Show user profile including the APP_ID which is required for modifications using JSON
+    """
+    print ('LOGIN SESSION:', login_session)
+    if 'userid' in login_session:
+        category = session.query(Category).first()
+        item = session.query(Item).first()
+        return render_template('profile.html', login_session=login_session, root=app.instance_path, category=category,
+                               item=item)
+    flash('Unfortunately you need to be logged in to see your profile', 'error')
+    return redirect(url_for('show_homepage'))
 
 
 @app.route('/categories/<int:category_id>/items')
@@ -90,7 +165,9 @@ def show_category_items(category_id):
     Displays all the items for the specified category
     """
     all_categories = session.execute(
-        'SELECT category.name, category_id, count(item.id) AS item_count FROM category LEFT JOIN item ON category.id = item.category_id GROUP BY category.name, category_id')
+        'SELECT category.name, category.id, count(item.id) AS item_count '
+        'FROM category LEFT JOIN item ON category.id = item.category_id '
+        'GROUP BY category.name, category_id')
     category = session.query(Category).filter(Category.id == category_id).first()
     items = session.query(Item).filter(Item.category_id == category_id)
     item_count = items.count()
@@ -100,6 +177,17 @@ def show_category_items(category_id):
                            items=items,
                            item_count=item_count,
                            login_session=login_session)
+
+
+@app.route('/api/categories')
+@limiter.limit("100/hour")
+@limiter.limit("2/minute")
+def api_categories():
+    """
+    Rate-limited JSON API to retrieve all categories
+    """
+    categories = session.query(Category)
+    return jsonify(json_list=[i.to_json() for i in categories.all()])
 
 
 @app.route('/api/categories/<int:category_id>/items')
@@ -113,23 +201,25 @@ def api_category_items(category_id):
     return jsonify(json_list=[i.to_json() for i in items.all()])
 
 
-@app.route('/api/categories/items/<int:item_id>')
+@app.route('/api/items/<int:item_id>', methods=['GET', 'POST'])
 @limiter.limit("100/hour")
 @limiter.limit("2/minute")
 def api_item_details(item_id):
     """
-    Displays full description of an item
+    Displays or edits specified item
     """
-    item = session.query(Item, User).join(User).filter(Item.id == item_id).one()
-    return jsonify(item.Item.to_json())
+    if request.method == 'GET':
+        item = session.query(Item, User).join(User).filter(Item.id == item_id).first()
+        return jsonify(item.Item.to_json())
+        # TODO - Add a POST method + HTTP Auth to allow a RESTful item modification
 
 
-@app.route('/categories/items/<int:item_id>')
+@app.route('/items/<int:item_id>')
 def show_item_details(item_id):
     """
     Displays full description of an item
     """
-    item = session.query(Item, User).join(User).filter(Item.id == item_id).one()
+    item = session.query(Item, User).join(User).filter(Item.id == item_id).first()
     return render_template('item_details.html', item=item, login_session=login_session)
 
 
@@ -137,17 +227,23 @@ def is_user_the_creator(item_id):
     """
     Return Item for specified ID if logged in
     user is also the creator of the target item
-    Otherwise, abort with a 403
+    Otherwise, redirect to safe home page with user message
     :param item_id:
     :return: The item + user record
     """
     # User must be logged in for GET and POST
     if 'userid' not in login_session:
-        abort(403, 'Unfortunately you need to be logged in to make changes')
-    item = session.query(Item, User).join(User).filter(Item.id == item_id).first()
+        # flash('Unfortunately you need to be logged in to make changes', 'error')
+        # return redirect(url_for('show_homepage'))
+        raise InvalidUsage('Unfortunately you need to be logged in to make changes', status_code=403)
+
+    item = session.query(Item, User).outerjoin(User).filter(Item.id == item_id).first()
+
     # For existing items, user must be item creator
     if item and item.Item.user_id != login_session['userid']:
-        abort(403, 'Unfortunately this item was not created by you')
+        # flash('Unfortunately this item was not created by you', 'error')
+        # return redirect(url_for('show_homepage'))
+        raise InvalidUsage('Unfortunately this item was not created by you', status_code=403)
     return item
 
 
@@ -179,10 +275,19 @@ def edit_item_details(item_id):
     item_id >= 1  =>  UPDATE item  (if user is original creator)
     item_id == 0  =>  CREATE item
     """
-    item = is_user_the_creator(item_id)
+    category_id = None
+    if 'category_id' in request.args:
+        category_id = int(request.args['category_id'])
+    if 'userid' not in login_session:
+        flash('Unfortunately you need to be logged in to make changes', 'error')
+        return redirect(url_for('show_homepage'))
+
+    item = None
+    if item_id != 0:
+        item = is_user_the_creator(item_id)
     if request.method == 'GET':
         categories = session.query(Category).order_by(asc(Category.name)).all()
-        return display_item(categories, item, item_id)
+        return display_item(categories, item, item_id, category_id)
     else:
         return save_item(item, item_id)
 
@@ -213,18 +318,14 @@ def save_item(item, item_id):
         session.add(new_item)
         session.commit()
         flash("Created " + new_item.name)
-        item = session.query(Item, User).join(User).filter(Item.id == new_item.id).first()
-        return render_template('item_details.html', item=item, login_session=login_session)
+        created_item = session.query(Item, User).filter(Item.id == new_item.id).join(User).first()
+        return render_template('item_details.html', item=created_item, login_session=login_session)
 
 
-def display_item(categories, item, item_id):
+def display_item(categories, item, item_id, initial_category_id):
     """
     Utility class for rendering a page for edit of existing item or creation of new item.
     CSRF Token regenerated for each new page
-    :param categories:
-    :param item:
-    :param item_id:
-    :return: Rendered html
     """
     if item:
         # Item already exists - display on page
@@ -234,11 +335,12 @@ def display_item(categories, item, item_id):
                                login_session=login_session,
                                csrf_token=generate_csrf_token())
     else:
+        print ('initial_category_id', initial_category_id)
         # Default fields for creating a new item
         return render_template('item_edit.html', item_id=0, item_name="",
                                item_description="", item_category="",
-                               item_category_id=0, categories=categories,
-                               login_session=login_session,
+                               item_category_id=initial_category_id, categories=categories,
+                               login_session=login_session, initial_category_id=initial_category_id,
                                csrf_token=generate_csrf_token())
 
 
@@ -251,14 +353,6 @@ def redirect_dest(fallback):
     return redirect(destination_url)
 
 
-@app.route('/logout')
-def logout():
-    login_session.clear()
-    next_redirect = request.args.get('next')
-    flash('You have been logged out')
-    return redirect(next_redirect)
-
-
 @app.route('/login')
 def login_redirect():
     """
@@ -268,12 +362,14 @@ def login_redirect():
     next_redirect = request.args.get('next')
     access_token = request.args.get('access_token')
     d = amazon_authorization(access_token)
+    print ("Amazon data:", d)
     # # State token to prevent CSRF
     # state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     # login_session['state'] = state
     # Find user in database by email or create new record
     user = session.query(User).filter(User.email == d['email']).first()
     if user is None:
+        print ("Creating new user in database")
         m = hashlib.md5()
         m.update(d['email'])
         gravatar = 'https://secure.gravatar.com/avatar/' + m.hexdigest() + '?size=35'
@@ -281,9 +377,16 @@ def login_redirect():
         session.add(user)
         session.commit()
 
+    # Update the Amazon ID for the user if not already set
+    if user.client_id != d['user_id']:
+        user.client_id = d['user_id']
+        session.commit()
+
     login_session['userid'] = user.id
     login_session['picture'] = user.picture
     login_session['name'] = user.name
+    login_session['email'] = user.email
+    login_session['client_id'] = user.client_id
 
     flash('You were successfully logged in')
 

@@ -11,7 +11,6 @@
                 This cannot be undone!</h5>
         </div>
     </div>
-
     <form action="{{ url_for('delete_item_details',item_id=item_id) }}" method="POST" class="form-horizontal">
         <div class="row h3">
             <input name=_csrf_token type=hidden value="{{ csrf_token }}">

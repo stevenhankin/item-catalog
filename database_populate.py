@@ -56,7 +56,6 @@ def add_categories(session, user_id, category, item):
     """Categories for Cars, Food and Cats. A short delay is used between
     adding items to categories to ensure that there is a "latest" ordering
     :param user_id: ID of user that has created these categories and items
-    :return:
     """
     category1 = category(user_id=user_id, name="Cars")
     category2 = category(user_id=user_id, name="Food")
@@ -78,7 +77,6 @@ def add_categories(session, user_id, category, item):
 def populate(session, user, category, item):
     """
     Populate schema with test data
-    :return:
     """
     # Create user and associated records
     print ("Populating tables...")

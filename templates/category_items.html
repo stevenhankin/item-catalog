@@ -1,8 +1,15 @@
 {% extends "categories_parent.html" %}
 {% block items %}
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-4">
             <h3>{{ category.name }} ({{ item_count }} items)</h3>
+        </div>
+        <div class="col-sm-3 h3">
+            {% if login_session['userid'] %}
+                <a href="{{ url_for('edit_item_details',item_id=0, category_id=category.id) }}">
+                    <button class="btn-sm btn-primary">Create Item</button>
+                </a>
+            {% endif %}
         </div>
     </div>
     {% for item in items %}

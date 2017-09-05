@@ -33,14 +33,22 @@ body {
 
 .picture {
     border-radius: 50%;
+    border: 2px solid blue
 }
 
 .glyph {
     color: red;
 }
 
-.flash-message {
+.message {
     background-color: wheat;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.error {
+    background-color: red;
+    color: whitesmoke;
     text-align: center;
     margin-top: 10px;
 }
@@ -64,7 +72,7 @@ body {
     /* For screens wider than phone vertical display: */
     #logout-text {
         display: block;
-        padding: 8px 40px 0 0;
+        padding: 10px 44px 0 0;
     }
 
     #LargeAmazonButton {
@@ -74,8 +82,4 @@ body {
     #SmallAmazonButton {
         display: none;
     }
-}
-
-.moo {
-    height: 100%;
 }

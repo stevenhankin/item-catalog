@@ -2,46 +2,44 @@
 {% block body %}
     <div class="row">
         <div class="col-sm-12">
-
             <div class="row">
                 <div class="col-sm-4 h3">
                     {{ item.Item.name }}
                 </div>
+                <div class="col-sm-4">
+                    <div class="row">
+                        {% if login_session['userid'] == item.Item.user_id %}
+                            <div class="col-xs-2 h3">
+                                <a href="{{ url_for('edit_item_details',item_id=item.Item.id) }}" data-toggle="tooltip"
+                                   data-placement="top" title="Edit item">
+                                    <span class="glyphicon glyphicon-pencil glyph"></span>
+                                </a>
+                            </div>
 
-                {% if login_session['userid'] %}
-                    <div class="col-sm-1 h3">
-                        <a href="{{ url_for('edit_item_details',item_id=item.Item.id) }}" data-toggle="tooltip"
-                           data-placement="top" title="Edit item">
-                            <span class="glyphicon glyphicon-pencil glyph"></span>
-                        </a>
+                            <div class="col-xs-2 h3">
+                                <a href="{{ url_for('delete_item_details',item_id=item.Item.id) }}"
+                                   data-toggle="tooltip" data-placement="top" title="Delete item">
+                                    <span class="glyphicon glyphicon-trash glyph"></span>
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
-
-                    <div class="col-sm-1 h3">
-                        <a href="{{ url_for('delete_item_details',item_id=item.Item.id) }}" data-toggle="tooltip" data-placement="top" title="Delete item">
-                            <span class="glyphicon glyphicon-trash glyph"></span>
-                        </a>
-                    </div>
-                {% endif %}
+                </div>
             </div>
-
             <div class="row">
-                <div class="col-sm-6">Description: {{ item.Item.description }}</div>
+                <div class="col-sm-12">Description: {{ item.Item.description }}</div>
             </div>
-
             <div class="row">
-                <div class="col-sm-6">Created by {{ item.User.name }} on {{ item.Item.time_created }}</div>
+                <div class="col-sm-12">Created by {{ item.User.name }} on {{ item.Item.time_created }}</div>
             </div>
-
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     {% if item.Item.time_updated %} Last updated on {{ item.Item.time_updated }}
                     {% else %}
                         Never updated
                     {% endif %}
                 </div>
             </div>
-
         </div>
     </div>
-
 {% endblock %}

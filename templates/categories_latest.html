@@ -1,11 +1,13 @@
 {% extends "categories_parent.html" %}
 {% block items %}
     <div class="row">
-        <div class="col-sm-3 h2">Latest {{ max_items }} Items</div>
-        <div class="col-sm-3 h2">
+        <div class="col-sm-4 h3">Latest {{ max_items }} Items</div>
+        <div class="col-sm-3 h3">
+            {% if login_session['userid'] %}
             <a href="{{ url_for('edit_item_details',item_id=0) }}">
                 <button class="btn-sm btn-primary">Create Item</button>
             </a>
+            {% endif %}
         </div>
     </div>
     {% for item in items %}

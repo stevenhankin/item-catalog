@@ -1,17 +1,14 @@
 {% extends "main.html" %}
 {% block body %}
     <div class="row">
-
-
-        <div class="col-md-2 col-sm-4 col-xs-5 category-list">
-
+        <div class="col-md-2 col-sm-3 col-xs-5 category-list">
             <div class="row">
                 <div class="col-md-12">
                     <h3>Categories</h3>
                 </div>
             </div>
-
             {% for category in all_categories %}
+{#                {{ category }}#}
                 <div class="row">
                     <div class="col-sm-12 h4">
                         <a href="{{ url_for('show_category_items',category_id=category[1]) }}">{{ category[0] }} <span
@@ -21,7 +18,7 @@
                 </div>
             {% endfor %}
         </div>
-        <div class="col-md-9 col-sm-7 col-xs-6 category-items">
+        <div class="col-md-10 col-sm-9 col-xs-7 category-items">
             {% block items %}
             {% endblock %}
         </div>

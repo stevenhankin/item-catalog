@@ -1,0 +1,80 @@
+{% extends "main.html" %}
+{% block body %}
+    <div class="row">
+        <div class="col-sm-12 h2">
+            Profile
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="name" class="control-label col-sm-4">Name</label>
+                    <div class="col-sm-8">
+                        <p id="name" class="form-control">{{ login_session['name'] }}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email" class="control-label col-sm-4">Email address</label>
+                    <div class="col-sm-8">
+                        <p id="email" class="form-control">{{ login_session['email'] }}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="client-id" class="control-label col-sm-4">Client Id</label>
+                    <div class="col-sm-8">
+                        <p id="client-id" class="form-control">{{ login_session['client_id'] }}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="logout" class="control-label col-sm-4">Not {{ login_session['name'] }}?</label>
+                    <div class="col-sm-8">
+                        <a id="Logout" href="{{ url_for('logout_redirect') }}">
+                            <button type="button" class="btn-primary">Sign Out</button>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 h2">
+            Query API
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-sm-12">
+
+                <table class="table">
+                    <tr>
+                        <th>Request</th>
+                        <th>Path</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>Categories</td>
+                        <td>/api/categories</td>
+                        <td><a href="{{ url_for('api_categories') }}" class="form-control">
+                            {{ url_for('api_categories') }}
+                        </a></td>
+                    </tr>
+                    <tr>
+                        <td>Items in Category</td>
+                        <td>/api/categories/&lt;int:category_id&gt;</td>
+                        <td><a href="{{ url_for('api_category_items',category_id=category.id) }}"
+                               class="form-control">{{ url_for('api_category_items',category_id=category.id) }}</a></td>
+                    </tr>
+                    <tr>
+                        <td>Item Details</td>
+                        <td>/api/items/&lt;int:item_id&gt;</td>
+                        <td><a href="{{ url_for('api_item_details',item_id=item.id) }}"
+                               class="form-control">{{ url_for('api_item_details',item_id=item.id) }}</a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
