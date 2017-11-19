@@ -38,7 +38,7 @@ Local VM is most recommended since it will isolate the installation and configur
 Heroku is least recommended due to sqlite data layer; Sqlite is not reliable in such an environment and Postgres should be used instead (as a Heroku Addon). 
 The database in this project is setup in-memory, but this does result in more that one instance in the application which can make changes appear to come and go.
 
-####1. Local VM
+#### 1. Local VM
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vagrant](https://www.vagrantup.com/downloads.html)
 2. Run the following:
 ```Shell
@@ -51,7 +51,7 @@ gunicorn application:app -b 0.0.0.0:8000
 ```
 3. Open app in [browser](http://0.0.0.0:8000)
 
-####2. Local Host
+#### 2. Local Host
 1. Run the following:
 ```Shell
 git clone https://github.com/stevenhankin/catalog
@@ -61,7 +61,7 @@ pip install -r requirements.txt
 ```
 2. Open app in [browser](http://127.0.0.1:8000)
 
-####3. Remotely on Heroku Platform
+#### 3. Remotely on Heroku Platform
 1. Create an account on [Heroku](https://dashboard.heroku.com/apps) website
 2. Create a new app
 3. Run the following:

@@ -124,7 +124,7 @@ def show_homepage():
         'SELECT category.name, category.id, count(item.id) AS item_count '
         'FROM category '
         'LEFT JOIN item ON category.id = item.category_id '
-        'GROUP BY category.name, category_id')
+        'GROUP BY category.name, category.id')
     items = session.query(Item, Category).join(Category).order_by(Item.time_updated.desc(), Item.time_created.desc(),
                                                                   Item.name).limit(5).all()
     return render_template('categories_latest.html',
@@ -167,7 +167,7 @@ def show_category_items(category_id):
     all_categories = session.execute(
         'SELECT category.name, category.id, count(item.id) AS item_count '
         'FROM category LEFT JOIN item ON category.id = item.category_id '
-        'GROUP BY category.name, category_id')
+        'GROUP BY category.name, category.id')
     category = session.query(Category).filter(Category.id == category_id).first()
     items = session.query(Item).filter(Item.category_id == category_id)
     item_count = items.count()

@@ -1,11 +1,14 @@
 """Create database schema for project."""
-from sqlalchemy import Column, ForeignKey, Integer, String, func
-from sqlalchemy.dialects.mysql import DATETIME
+from sqlalchemy import Column, ForeignKey, Integer, String, func, DateTime
+# from sqlalchemy.dialects.mysql import DATETIME
+# from sqlalchemy.dialects.postgresql import DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from database_populate import populate
 from sqlalchemy.orm import sessionmaker
+
+
 
 Base = declarative_base()
 
@@ -50,8 +53,8 @@ class Item(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     description = Column(String(4000), nullable=False)
-    time_created = Column(DATETIME(fsp=6), server_default=func.now())
-    time_updated = Column(DATETIME(timezone=True, fsp=6), onupdate=func.now())
+    time_created = Column(DateTime(timezone=True), server_default=func.now())
+    time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     def to_json(self):
         return {"item": {"id": self.id, "name": self.name, "category_id": self.category_id, "user_id": self.user_id,
@@ -60,7 +63,8 @@ class Item(Base):
 
 
 # engine = create_engine('sqlite:///itemcategories.db')
-engine = create_engine('sqlite://')
+#engine = create_engine('sqlite://')
+engine = create_engine('postgresql://catalog:catalog2017@localhost:5432/itemcatalogdb')
 
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
