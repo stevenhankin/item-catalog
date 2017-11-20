@@ -1,13 +1,10 @@
 """Create database schema for project."""
 from sqlalchemy import Column, ForeignKey, Integer, String, func, DateTime
-# from sqlalchemy.dialects.mysql import DATETIME
-# from sqlalchemy.dialects.postgresql import DATETIME
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from database_populate import populate
 from sqlalchemy.orm import sessionmaker
-
 
 
 Base = declarative_base()
@@ -62,8 +59,6 @@ class Item(Base):
                          "timeUpdated": self.time_updated}}
 
 
-# engine = create_engine('sqlite:///itemcategories.db')
-#engine = create_engine('sqlite://')
 engine = create_engine('postgresql://catalog:catalog2017@localhost:5432/itemcatalogdb')
 
 # Bind the engine to the metadata of the Base class so that the
@@ -81,4 +76,8 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 Base.metadata.create_all(engine)
-#populate(session, User, Category, Item)
+
+# ONLY when the database setup module is called directly
+# the intention will be to populate the database too
+if __name__ == "__main__":
+    populate(session, User, Category, Item)

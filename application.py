@@ -100,7 +100,7 @@ def generate_csrf_token():
     """
     if '_csrf_token' not in login_session:
         login_session['_csrf_token'] = b64encode(urandom(64)).decode()  # Cryptographically secure random key
-    print ("_csrf_token:" + login_session['_csrf_token'])
+    print("_csrf_token:" + login_session['_csrf_token'])
     return login_session['_csrf_token']
 
 
@@ -149,7 +149,7 @@ def show_profile():
     """
     Show user profile including the APP_ID which is required for modifications using JSON
     """
-    print ('LOGIN SESSION:', login_session)
+    print('LOGIN SESSION:', login_session)
     if 'userid' in login_session:
         category = session.query(Category).first()
         item = session.query(Item).first()
@@ -335,7 +335,7 @@ def display_item(categories, item, item_id, initial_category_id):
                                login_session=login_session,
                                csrf_token=generate_csrf_token())
     else:
-        print ('initial_category_id', initial_category_id)
+        print('initial_category_id', initial_category_id)
         # Default fields for creating a new item
         return render_template('item_edit.html', item_id=0, item_name="",
                                item_description="", item_category="",
@@ -362,14 +362,14 @@ def login_redirect():
     next_redirect = request.args.get('next')
     access_token = request.args.get('access_token')
     d = amazon_authorization(access_token)
-    print ("Amazon data:", d)
+    print("Amazon data:", d)
     # # State token to prevent CSRF
     # state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     # login_session['state'] = state
     # Find user in database by email or create new record
     user = session.query(User).filter(User.email == d['email']).first()
     if user is None:
-        print ("Creating new user in database")
+        print("Creating new user in database")
         m = hashlib.md5()
         m.update(d['email'])
         gravatar = 'https://secure.gravatar.com/avatar/' + m.hexdigest() + '?size=35'

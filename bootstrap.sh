@@ -1,6 +1,18 @@
 #
-# Steve Hankin 4th Sept 2017
+# Steve Hankin 20th Nov 2017
 #
+
+# Configure Firewall
+sudo ufw disable
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 2200/tcp
+sudo ufw allow www
+sudo ufw allow ntp
+sudo ufw allow 443/tcp
+sudo ufw enable
+
+# Install packages
 sudo apt-get install python-pip -y
 sudo apt-get install libcurl4-openssl-dev -y
 sudo apt-get install python-dev -y
@@ -21,7 +33,6 @@ sudo -u catalog -i <<EOF
 psql itemcatalogdb catalog -c "ALTER USER catalog WITH ENCRYPTED PASSWORD 'catalog2017';"
 EOF
 
-sudo sh -c 'echo "local   itemcatalogdb   catalog                                 trust" >> /etc/postgresql/*/main/pg_hba.conf'
+sudo bash -c 'echo "local   itemcatalogdb   catalog                                 trust" >> /etc/postgresql/*/main/pg_hba.conf'
 sudo service postgresql restart
 
-#cd /vagrant && gunicorn application:app -b 0.0.0.0:8000

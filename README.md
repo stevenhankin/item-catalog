@@ -3,16 +3,30 @@ Catalog is a web app that supports the categorisation of items for perusal (or m
 
 The application is a project from Udacity's [Full Stack Web Developer](https://www.udacity.com/course/full-stack-web-developer-nanodegree--nd004) course.
 
-### Features
+## Grader Information
+
+#### IP Address and Port
+* Amazon Lightsail Server: 35.177.46.95:2200 
+
+#### URL to hosted web application
+* https://www.itemcatalog.club
+
+#### 3rd party resources
+* Amazon Lightsail Server
 * Amazon Login authentication
+* Apache SSL
+* Domain name from [namecheap.com](https://www.namecheap.com)
+* [Let's Encrypt Certbot](https://letsencrypt.org)
+
+### Features
 * CSRF protection
 * API rate limiting
 * Responsive design
 * Heroku [demo site](https://hankste-catalog.herokuapp.com/)
 
 ## Pre-requisites
-* [Python v2.7](https://www.python.org/downloads/)
-
+The required software can be installed by running the **bootstrap.sh**, which will additionally create a configure
+the Postgres database.
 
 ## File list
 * Procfile - __Heroku application startup method__
@@ -20,14 +34,14 @@ The application is a project from Udacity's [Full Stack Web Developer](https://w
 * Vagrantfile - __Vagrant build file__
 * application.py - __Main application entry__
 * config.py - __Configuration parameters__
-* database__populate.py - __Generate initial test data__
-* database__setup.py - __Creates base schema. Called at application startup-up__
+* database_populate.py - __Generate initial test data (called from *database_setup.py*)__
+* database_setup.py - __Creates base schema. Called at application startup-up or directly when first installing__
 * requirements.txt - __Python requirements in Vagrant VM__
 * runtime.txt - __Heroku runtime engine requirement__
 * static/ - __Images, stylesheets__
 * templates/ - __Flask view templates__
 * test/ - __Contains example CSRF test__
-* vagrant__bootstrap.sh - __Installs Python Libraries and other software when VM is provisioned__
+* bootstrap.sh - __Installs Python Libraries and other software when executed__
 
 
 ## Installation
@@ -38,7 +52,24 @@ Local VM is most recommended since it will isolate the installation and configur
 Heroku is least recommended due to sqlite data layer; Sqlite is not reliable in such an environment and Postgres should be used instead (as a Heroku Addon). 
 The database in this project is setup in-memory, but this does result in more that one instance in the application which can make changes appear to come and go.
 
-#### 1. Local VM
+#### 1. Remote Linux Server
+1. Clone the repository locally
+2. Run ```bootstrap.sh```
+3. Run ```python database_setup.py```
+4. Add following section to **/etc/apache2/sites-enabled/000-default.conf** 
+```Listen 443
+<VirtualHost *:443>
+    ServerName www.itemcatalog.club
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/www.itemcatalog.club/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/www.itemcatalog.club/privkey.pem
+    WSGIScriptAlias / /var/www/html/myapp.wsgi
+Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>
+```
+**Note:** Change the URLs above as required
+
+#### 2. Local VM
 1. Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vagrant](https://www.vagrantup.com/downloads.html)
 2. Run the following:
 ```Shell
@@ -51,7 +82,7 @@ gunicorn application:app -b 0.0.0.0:8000
 ```
 3. Open app in [browser](http://0.0.0.0:8000)
 
-#### 2. Local Host
+#### 3. Local Host
 1. Run the following:
 ```Shell
 git clone https://github.com/stevenhankin/catalog
@@ -61,7 +92,7 @@ pip install -r requirements.txt
 ```
 2. Open app in [browser](http://127.0.0.1:8000)
 
-#### 3. Remotely on Heroku Platform
+#### 4. Remotely on Heroku Platform
 1. Create an account on [Heroku](https://dashboard.heroku.com/apps) website
 2. Create a new app
 3. Run the following:

@@ -55,7 +55,10 @@ def add_cat_items(session, category, user_id, item):
 def add_categories(session, user_id, category, item):
     """Categories for Cars, Food and Cats. A short delay is used between
     adding items to categories to ensure that there is a "latest" ordering
+    :param session
     :param user_id: ID of user that has created these categories and items
+    :param category
+    :param item
     """
     category1 = category(user_id=user_id, name="Cars")
     category2 = category(user_id=user_id, name="Food")
@@ -79,11 +82,11 @@ def populate(session, user, category, item):
     Populate schema with test data
     """
     # Create user and associated records
-    print ("Populating tables...")
+    print("Populating tables...")
     user1 = user(name="Steven Hankin",
                  email="steven.hankin@gmail.com",
                  picture="https://secure.gravatar.com/avatar/bbed4d2a6f627e45d8de9ed6e0c0a468?size=35")
     session.add(user1)
     session.commit()
     add_categories(session, user1.id, category, item)
-    print ("Finished populating.")
+    print("Finished populating.")
