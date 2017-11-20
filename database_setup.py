@@ -81,5 +81,4 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 Base.metadata.create_all(engine)
-
-populate(session, User, Category, Item)
+#populate(session, User, Category, Item)

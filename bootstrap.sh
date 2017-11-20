@@ -21,7 +21,7 @@ sudo -u catalog -i <<EOF
 psql itemcatalogdb catalog -c "ALTER USER catalog WITH ENCRYPTED PASSWORD 'catalog2017';"
 EOF
 
-sudo sh -c 'echo "local   itemcatalogdb   catalog                                 trust" >> /etc/postgresql/9.3/main/pg_hba.conf'
+sudo sh -c 'echo "local   itemcatalogdb   catalog                                 trust" >> /etc/postgresql/*/main/pg_hba.conf'
 sudo service postgresql restart
 
 #cd /vagrant && gunicorn application:app -b 0.0.0.0:8000
