@@ -52,7 +52,7 @@ Local VM is most recommended since it will isolate the installation and configur
 Heroku is least recommended due to sqlite data layer; Sqlite is not reliable in such an environment and Postgres should be used instead (as a Heroku Addon). 
 The database in this project is setup in-memory, but this does result in more that one instance in the application which can make changes appear to come and go.
 
-#### 1. Remote Linux Server
+### 1. Remote Linux Server Deployment
 1. Clone the repository locally
 2. Run ```bootstrap.sh```
 3. Run ```python database_setup.py```
@@ -67,6 +67,7 @@ The database in this project is setup in-memory, but this does result in more th
 Include /etc/letsencrypt/options-ssl-apache.conf
 </VirtualHost>
 ```
+5. Restart Apache ```sudo apache2ctl restart```
 **Note:** Change the URLs above as required
 
 #### 2. Local VM
@@ -124,16 +125,16 @@ To access the JSON data structure for an entity, make a request with the mime ty
 ```
 Example using curl command:
 ```Shell
-curl -H "Accept: application/json" http://127.0.0.1:8000/categories/1/items
+curl -H "Accept: application/json" https://www.itemcatalog.club/api/categories/1/items
 ```
 
 2. Details for a specified item id
 ```Shell
-/api/categories/items/<int:item_id>
+/api/items/<int:item_id>
 ```
 Example using curl command:
 ```Shell
-curl -H "Accept: application/json" http://127.0.0.1:8000/categories/items/1
+curl -H "Accept: application/json" https://www.itemcatalog.club/api/items/1
 ```
 
 ### Testing the Rate Limiting for Developer API
@@ -141,7 +142,7 @@ A simple loop can quickly expose the "HTTP-429 Too Many Requests" reply:
 ```Shell
 while [[ 1==1 ]]
 do
-curl -H "Accept: application/json" http://127.0.0.1:8000/api/categories/items/1
+curl -H "Accept: application/json" https://www.itemcatalog.club/api/categories/1/items
 sleep 0.2
 done
 ```
