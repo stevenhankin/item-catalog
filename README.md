@@ -6,10 +6,22 @@ The application is a project from Udacity's [Full Stack Web Developer](https://w
 ## Grader Information
 
 #### IP Address and Port
-* Amazon Lightsail Server: 35.177.46.95:2200 
+* 35.177.46.95:2200 (Amazon Lightsail Server)
 
 #### URL to hosted web application
 * https://www.itemcatalog.club
+
+#### Software and configuration changes
+* Upgraded Linux packages and distribution
+* UFW firewall (see **bootstrap.sh**) for SSH (port 2200), HTTP (port 80), and NTP (port 123) and SSL (port 443)
+* Created a grader and catalog unix accounts 
+* Created rsa public key for grader .ssh/authorized_keys
+* Configured /etc/ssh/sshd_config to use authorized_keys
+* Added grader to /etc/sudoers.d/90-cloud-init-users
+* Installed and configured Apache (to use WSGI and SSL)
+* Installed and configured Postgres
+* Setup a catalog database user as application schema
+* Converted Python code from SQLite to Postgres Database
 
 #### 3rd party resources
 * Amazon Lightsail Server
