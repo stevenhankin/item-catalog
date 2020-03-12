@@ -56,7 +56,7 @@ pbr==1.8.0
 Persistence==2.13.2
 persistent==4.2.4.2
 prettytable==0.7.2
-psutil==5.0.1
+psutil==5.6.6
 psycopg2==2.7.3.2
 pyasn1==0.1.9
 pyasn1-modules==0.0.11
