@@ -4,7 +4,7 @@ Acquisition==4.4.2
 asn1crypto==0.22.0
 AuthEncoding==4.0.0
 beautifulsoup4==4.6.0
-bleach==2.0.0
+bleach==3.1.2
 BTrees==4.4.1
 certbot==0.19.0
 certbot-apache==0.19.0
