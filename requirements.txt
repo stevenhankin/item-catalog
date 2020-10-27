@@ -16,7 +16,7 @@ click==6.7
 colorama==0.2.5
 ConfigArgParse==0.11.0
 configobj==5.0.6
-cryptography==1.9
+cryptography==3.2
 DateTime==4.2
 dnspython==1.15.0
 DocumentTemplate==2.13.4
